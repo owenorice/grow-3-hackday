@@ -11,6 +11,7 @@ import {
   ZoomOut,
   RotateCcw,
 } from 'lucide-react';
+import { ServiceModal } from '../staff/ServiceModal';
 
 export const FloorplanView: React.FC = () => {
   const {
@@ -20,9 +21,10 @@ export const FloorplanView: React.FC = () => {
     selectedMachine,
     appMode,
     toggleMachineStatus,
-    logService,
     toggleMaintenance,
   } = useGym();
+
+  const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
 
   const isStaff = appMode === 'staff';
 
@@ -444,14 +446,14 @@ export const FloorplanView: React.FC = () => {
                   {/* Pulsing Beacon for Selected Machine */}
                   {isSelected && (
                     <rect
-                      x={m.coordinates.x - 5}
-                      y={m.coordinates.y - 5}
-                      width={m.coordinates.width + 10}
-                      height={m.coordinates.height + 10}
-                      rx="10"
+                      x={m.coordinates.x - 4}
+                      y={m.coordinates.y - 4}
+                      width={m.coordinates.width + 8}
+                      height={m.coordinates.height + 8}
+                      rx="0"
                       fill="none"
-                      stroke="#38bdf8"
-                      strokeWidth="3.5"
+                      stroke="#97D700"
+                      strokeWidth="2.5"
                       className="animate-pulse"
                     />
                   )}
@@ -463,33 +465,43 @@ export const FloorplanView: React.FC = () => {
                       y={m.coordinates.y - 4}
                       width={m.coordinates.width + 8}
                       height={m.coordinates.height + 8}
-                      rx="9"
+                      rx="0"
                       fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="2.5"
+                      stroke="#DC3545"
+                      strokeWidth="2"
                       strokeDasharray="4 2"
                       className="animate-pulse"
                     />
                   )}
 
-                  {/* Main Machine Box */}
+                  {/* Main Machine Box - Sharp Brutalist Zero-Radius */}
                   <rect
                     x={m.coordinates.x}
                     y={m.coordinates.y}
                     width={m.coordinates.width}
                     height={m.coordinates.height}
-                    rx="7"
+                    rx="0"
                     fill={fill}
-                    stroke={stroke}
-                    strokeWidth={isSelected || isHovered ? '2.5' : '1.5'}
+                    stroke={isSelected ? '#97D700' : stroke}
+                    strokeWidth={isSelected || isHovered ? '2' : '1.5'}
                     filter={isAvailable && !isStaff ? 'url(#volt-glow)' : undefined}
                     className="transition-colors duration-200"
+                  />
+
+                  {/* Machine Metallic Bevel Accent */}
+                  <line
+                    x1={m.coordinates.x}
+                    y1={m.coordinates.y + 1}
+                    x2={m.coordinates.x + m.coordinates.width}
+                    y2={m.coordinates.y + 1}
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth="1"
                   />
 
                   {/* Visual Machine Glyph / Details */}
                   {/* Treadmill running lines */}
                   {m.code.startsWith('TM') && (
-                    <g opacity="0.4">
+                    <g opacity="0.45">
                       <line x1={m.coordinates.x + 8} y1={m.coordinates.y + 10} x2={m.coordinates.x + m.coordinates.width - 8} y2={m.coordinates.y + 10} stroke="#ffffff" strokeWidth="1" />
                       <line x1={m.coordinates.x + 8} y1={m.coordinates.y + m.coordinates.height - 10} x2={m.coordinates.x + m.coordinates.width - 8} y2={m.coordinates.y + m.coordinates.height - 10} stroke="#ffffff" strokeWidth="1" />
                     </g>
@@ -497,7 +509,7 @@ export const FloorplanView: React.FC = () => {
 
                   {/* Power Rack Barbell Glyph */}
                   {m.code.startsWith('SQ') && (
-                    <g opacity="0.4">
+                    <g opacity="0.45">
                       <line x1={m.coordinates.x + 10} y1={m.coordinates.y + m.coordinates.height / 2} x2={m.coordinates.x + m.coordinates.width - 10} y2={m.coordinates.y + m.coordinates.height / 2} stroke="#ffffff" strokeWidth="2" />
                       <circle cx={m.coordinates.x + 14} cy={m.coordinates.y + m.coordinates.height / 2} r="4" fill="#ffffff" />
                       <circle cx={m.coordinates.x + m.coordinates.width - 14} cy={m.coordinates.y + m.coordinates.height / 2} r="4" fill="#ffffff" />
@@ -506,7 +518,7 @@ export const FloorplanView: React.FC = () => {
 
                   {/* Cable Tower Pulley Arms Glyph */}
                   {m.code.startsWith('CC') && (
-                    <g opacity="0.4">
+                    <g opacity="0.45">
                       <circle cx={m.coordinates.x + 12} cy={m.coordinates.y + 15} r="4" fill="#ffffff" />
                       <circle cx={m.coordinates.x + m.coordinates.width - 12} cy={m.coordinates.y + 15} r="4" fill="#ffffff" />
                       <line x1={m.coordinates.x + 12} y1={m.coordinates.y + 15} x2={m.coordinates.x + m.coordinates.width / 2} y2={m.coordinates.y + m.coordinates.height - 12} stroke="#ffffff" strokeWidth="1" />
@@ -514,16 +526,17 @@ export const FloorplanView: React.FC = () => {
                     </g>
                   )}
 
-                  {/* Code Label */}
+                  {/* Code Label with Oswald Typography */}
                   <text
                     x={m.coordinates.x + m.coordinates.width / 2}
                     y={m.coordinates.y + m.coordinates.height / 2 - 4}
                     textAnchor="middle"
                     dominantBaseline="middle"
                     fill="#ffffff"
-                    fontSize={m.coordinates.width > 90 ? '11' : '10'}
+                    fontSize={m.coordinates.width > 90 ? '12' : '11'}
                     fontWeight="800"
-                    letterSpacing="0.03em"
+                    letterSpacing="1px"
+                    style={{ fontFamily: 'Oswald, sans-serif' }}
                   >
                     {m.code}
                   </text>
@@ -534,14 +547,15 @@ export const FloorplanView: React.FC = () => {
                     y={m.coordinates.y + m.coordinates.height / 2 + 10}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fill={isSelected ? '#bae6fd' : '#f8fafc'}
+                    fill={isSelected ? '#97D700' : '#CCCCCC'}
                     fontSize="8"
-                    fontWeight="600"
+                    fontWeight="700"
+                    letterSpacing="0.5px"
                   >
                     {!isStaff
                       ? m.status === 'in_use'
-                        ? `${m.currentSessionMinutes}m in use`
-                        : 'FREE'
+                        ? `${m.currentSessionMinutes}M IN USE`
+                        : 'AVAILABLE'
                       : `${m.hoursSinceLastService}h / ${m.serviceThresholdHours}h`}
                   </text>
 
@@ -550,9 +564,9 @@ export const FloorplanView: React.FC = () => {
                     <circle
                       cx={m.coordinates.x + m.coordinates.width - 4}
                       cy={m.coordinates.y + 4}
-                      r="6"
-                      fill={isOverdue ? '#ef4444' : '#f59e0b'}
-                      stroke="#0f172a"
+                      r="5"
+                      fill={isOverdue ? '#DC3545' : '#FFC107'}
+                      stroke="#000000"
                       strokeWidth="1.5"
                     />
                   )}
@@ -562,21 +576,21 @@ export const FloorplanView: React.FC = () => {
           </svg>
         </div>
 
-        {/* Hover Tooltip Preview */}
+        {/* Hover Tooltip Preview - Brutalist Village Gym Pod */}
         {hoveredMachine && !selectedMachine && (
           <div
-            className="absolute top-16 left-6 pointer-events-none bg-slate-900/95 backdrop-blur-md border border-slate-700/80 px-3 py-2 rounded-xl shadow-xl z-30 transition-all text-xs"
+            className="absolute top-16 left-6 pointer-events-none bg-black/95 backdrop-blur-md border-2 border-[#333333] px-3.5 py-2.5 shadow-[0_0_20px_rgba(0,0,0,0.8)] z-30 transition-all text-xs"
           >
             <div className="flex items-center gap-2">
-              <span className="font-mono font-bold text-slate-200">{hoveredMachine.code}</span>
-              <span className="font-semibold text-white">{hoveredMachine.name}</span>
+              <span className="font-display font-black text-white tracking-wider">{hoveredMachine.code}</span>
+              <span className="font-bold text-white uppercase tracking-wider">{hoveredMachine.name}</span>
             </div>
-            <div className="flex items-center gap-2 mt-1 text-[11px]">
-              <span className={hoveredMachine.status === 'available' ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold'}>
-                {hoveredMachine.status === 'available' ? '🟢 Available' : `🔴 In Use (${hoveredMachine.currentSessionMinutes}m)`}
+            <div className="flex items-center gap-2 mt-1 text-[11px] uppercase tracking-wider">
+              <span className={hoveredMachine.status === 'available' ? 'text-[#97D700] font-black' : 'text-[#DC3545] font-black'}>
+                {hoveredMachine.status === 'available' ? '● AVAILABLE' : `● OCCUPIED (${hoveredMachine.currentSessionMinutes}M)`}
               </span>
-              <span className="text-slate-500">•</span>
-              <span className="text-slate-400">{hoveredMachine.zone}</span>
+              <span className="text-[#555555]">•</span>
+              <span className="text-[#AAAAAA]">{hoveredMachine.zone}</span>
             </div>
           </div>
         )}
@@ -702,10 +716,10 @@ export const FloorplanView: React.FC = () => {
 
                 <div className="flex gap-2 pt-1">
                   <button
-                    onClick={() => logService(selectedMachine.id)}
+                    onClick={() => setServicingMachine(selectedMachine)}
                     className="flex-1 vg-btn vg-btn-3"
                   >
-                    <Wrench className="w-3.5 h-3.5" /> LOG SERVICE
+                    <Wrench className="w-3.5 h-3.5 mr-1" /> INSPECT & CLEAR
                   </button>
                   <button
                     onClick={() => toggleMaintenance(selectedMachine.id)}
@@ -719,6 +733,14 @@ export const FloorplanView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Staff Maintenance Inspection Modal */}
+      {servicingMachine && (
+        <ServiceModal
+          machine={servicingMachine}
+          onClose={() => setServicingMachine(null)}
+        />
+      )}
     </div>
   );
 };

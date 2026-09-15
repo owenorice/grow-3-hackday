@@ -15,12 +15,12 @@ A high-voltage web application built for **Village Health & Wellness Clubs**, ma
 
 ## 👥 Parallel AI Developer Team Assignments
 
-| Developer | Assigned Issue | Priority | Focus Area | Branch |
+| Developer | Assigned Issue | Priority | Focus Area | Status |
 |---|---|---|---|---|
-| 👤 **Owen** | **[#8 Athletic Split-Pod Hero](https://github.com/owenorice/grow-3-hackday/issues/8)** & **[#11 UI Beautification & Polish](https://github.com/owenorice/grow-3-hackday/issues/11)** | `P1-mvp` / `P3` | `src/components/layout/` & styling | `feature/issue-8-hero-pod` |
-| 👤 **Oliver** | **[#3 Filterable Equipment Directory & Pod Cards](https://github.com/owenorice/grow-3-hackday/issues/3)** & **[#9 Workout Circuit & Linear Queue](https://github.com/owenorice/grow-3-hackday/issues/9)** | `P1-mvp` / `P2` | `src/components/equipment/` & `src/components/circuit/` | `feature/issue-3-equipment-list` |
-| 👤 **Tom** | **[#4 Usage Analytics & Brutalist Telemetry Charts](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2-enhancement` | `src/components/analytics/` | `feature/issue-4-analytics` |
-| 👤 **Conor** | **[#6 Staff Maintenance Inspection Modal](https://github.com/owenorice/grow-3-hackday/issues/6)** & **[#5 Demo Simulator Controls](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2-enhancement` | `src/components/staff/` & `src/components/simulator/` | `feature/issue-6-staff-modal` |
+| 👤 **Owen** | **[#8 Athletic Split-Pod Hero](https://github.com/owenorice/grow-3-hackday/issues/8)** & **[#11 UI Beautification](https://github.com/owenorice/grow-3-hackday/issues/11)** & **[#2 SVG Floorplan](https://github.com/owenorice/grow-3-hackday/issues/2)** | `P1` / `P3` | `src/components/layout/` & `floorplan/` | ✅ **SHIPPED** (PRs #7, #13, #14) |
+| 👤 **Oliver** | **[#3 Filterable Equipment Directory](https://github.com/owenorice/grow-3-hackday/issues/3)** & **[#9 Workout Circuit Queue](https://github.com/owenorice/grow-3-hackday/issues/9)** & **[#18 UX Clarity](https://github.com/owenorice/grow-3-hackday/issues/18)** & **[#20 Resolve PR #16 Conflicts](https://github.com/owenorice/grow-3-hackday/issues/20)** | `P1` / `P2` / `P3` | `src/components/` & store | 🟡 **IN PROGRESS** (Issues #18, #20) |
+| 👤 **Tom** | **[#4 Usage Analytics & Brutalist Telemetry Charts](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2` | `src/components/analytics/` | ✅ **SHIPPED** (PR #15) |
+| 👤 **Conor** | **[#6 Staff Maintenance Inspection Modal](https://github.com/owenorice/grow-3-hackday/issues/6)** & **[#5 Demo Simulator Controls](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2` | `src/components/staff/` & `simulator/` | ✅ **SHIPPED** (PRs #5, #17) |
 
 ---
 
