@@ -19,7 +19,7 @@ import {
   Sparkles,
   RotateCcw,
 } from 'lucide-react';
-import { EquipmentCategory } from '../../types/gym';
+import { EquipmentCategory, GymMachine } from '../../types/gym';
 
 export const WorkoutCircuitDrawer: React.FC = () => {
   const {
@@ -34,12 +34,32 @@ export const WorkoutCircuitDrawer: React.FC = () => {
     selectMachine,
     setActiveTab,
     appMode,
+    swapCircuitMachine,
+    optimizeCircuitOrder,
   } = useGym();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   // If in staff mode, hide member workout circuit or keep minimal
   const isStaff = appMode === 'staff';
+
+  // Biomechanical alternative finder based on RFC-02
+  const getBiomechanicalAlternative = (machine?: GymMachine | null) => {
+    if (!machine || machine.status === 'available') return null;
+    return (
+      machines.find(m => {
+        if (m.id === machine.id || m.status !== 'available') return false;
+        if (m.category === machine.category) return true;
+        if (
+          (machine.category === 'racks_benches' || machine.category === 'free_weights') &&
+          (m.category === 'racks_benches' || m.category === 'free_weights')
+        )
+          return true;
+        if (machine.category === 'cables_plate' && m.category === 'cables_plate') return true;
+        return false;
+      }) || null
+    );
+  };
 
   const stationsWithData = useMemo(() => {
     return circuit.stations.map((station, index) => {
@@ -175,6 +195,21 @@ export const WorkoutCircuitDrawer: React.FC = () => {
               </button>
             )}
 
+            {/* AI Smart Optimize Button in docked bar if > 1 station */}
+            {circuit.stations.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  optimizeCircuitOrder();
+                }}
+                className="hidden sm:flex bg-[#111111] hover:bg-[#222222] border border-[#97D700] text-[#97D700] hover:text-white font-black px-2.5 py-1.5 text-xs uppercase tracking-[1px] items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(151,215,0,0.2)]"
+                title="AI Smart Sequence: re-orders queued stations so currently free machines come first to eliminate wait times"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#97D700]" />
+                <span className="hidden md:inline">AI</span> OPTIMIZE
+              </button>
+            )}
+
             {/* Toggle Drawer Button */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -212,12 +247,25 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsExpanded(false)}
-                className="text-[#AAAAAA] hover:text-white p-1.5 bg-[#222222] hover:bg-[#333333] transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+
+              <div className="flex items-center gap-2">
+                {circuit.stations.length > 1 && (
+                  <button
+                    onClick={optimizeCircuitOrder}
+                    className="vg-btn vg-btn-3 text-xs px-3 py-1.5 flex items-center gap-1.5 font-black uppercase tracking-[1px] shadow-[0_0_15px_rgba(151,215,0,0.3)]"
+                    title="AI Smart Sequence: re-order queued stations so currently free machines come first to eliminate wait times"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>AI SMART OPTIMIZE</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  className="text-[#AAAAAA] hover:text-white p-1.5 bg-[#222222] hover:bg-[#333333] transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Telemetry Summary Banner */}
@@ -256,6 +304,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                 stationsWithData.map((s, idx) => {
                   const m = s.machine;
                   if (!m) return null;
+                  const altMachine = getBiomechanicalAlternative(m);
 
                   return (
                     <div
@@ -421,10 +470,36 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                           </div>
                         </div>
                       </div>
+
+                      {/* Biomechanical Alternative Banner if machine is busy/maintenance */}
+                      {altMachine && m.status !== 'available' && !s.isPast && (
+                        <div className="mt-3 p-2.5 bg-[#14170f] border border-[#97D700]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#97D700] shrink-0" />
+                            <span className="text-[11px] text-[#DDDDDD]">
+                              <strong className="text-[#97D700]">AI BIOMECHANICAL ALT:</strong> {altMachine.name} ({altMachine.code}) is ready now
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => swapCircuitMachine(m.id, altMachine.id)}
+                            className="vg-btn vg-btn-3 text-[10px] px-3 py-1 font-black uppercase tracking-wider shrink-0"
+                          >
+                            SWAP STATION
+                          </button>
+                        </div>
+                      )}
                     </div>
                   );
                 })
               )}
+            </div>
+
+            {/* Sequential Reservation Guidance Hint */}
+            <div className="p-3 bg-[#0a0a0a] border-t border-[#222222] text-[11px] text-[#888888] flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5 text-[#97D700] shrink-0" />
+              <span>
+                Sequential reservation holds your slot while you transition between stations with automated 2-minute sanitize buffers.
+              </span>
             </div>
 
             {/* Footer Toolbar */}

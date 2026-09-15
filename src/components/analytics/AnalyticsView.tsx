@@ -16,8 +16,11 @@ import {
   ArrowUpDown,
   Flame,
   CheckCircle2,
+  FileSpreadsheet,
+  BarChart3,
 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
+import { CapexExportModal } from './CapexExportModal';
 
 type SortOption = 'utilization' | 'hours' | 'urgency' | 'code';
 type TelemetryFilter = 'overdue_only' | 'critical_only' | 'all';
@@ -38,6 +41,7 @@ export const AnalyticsView: React.FC = () => {
   const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
   const [selectedChartZone, setSelectedChartZone] = useState<GymZone | 'all'>('all');
   const [telemetryFilter, setTelemetryFilter] = useState<TelemetryFilter>('overdue_only');
+  const [isCapexModalOpen, setIsCapexModalOpen] = useState<boolean>(false);
 
   // Leaderboard filters
   const [leaderboardSearch, setLeaderboardSearch] = useState<string>('');
@@ -126,6 +130,34 @@ export const AnalyticsView: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       
+      {/* ================= EXECUTIVE TELEMETRY HEADER & CAPEX SUITE ================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-[#111111] border-2 border-[#333333] shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#97D700] text-black flex items-center justify-center font-black shrink-0">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 bg-black text-[#97D700] border border-[#333333]">
+                TELEMETRY & CAPEX SUITE
+              </span>
+              <span className="text-[10px] font-mono text-[#AAAAAA]">22 SENSOR NODES LIVE</span>
+            </div>
+            <h2 className="text-base font-black uppercase tracking-[2px] text-white">
+              FACILITY UTILIZATION & FLEET OVERUSE INTELLIGENCE
+            </h2>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsCapexModalOpen(true)}
+          className="vg-btn vg-btn-3 text-xs px-4 py-2.5 flex items-center gap-2 font-black shadow-[0_0_20px_rgba(151,215,0,0.3)] self-start sm:self-auto"
+        >
+          <FileSpreadsheet className="w-4 h-4" />
+          <span>CAPEX & FLEET ROI EXPORT (.CSV)</span>
+        </button>
+      </div>
+
       {/* ================= SECTION 1: TOP ATHLETIC INSIGHT PODS ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Pod 1: Optimal Workout Window */}
@@ -700,6 +732,13 @@ export const AnalyticsView: React.FC = () => {
           onClose={() => setServicingMachine(null)}
         />
       )}
+
+      {/* Executive Capex & Fleet ROI Telemetry Export Modal */}
+      <CapexExportModal
+        isOpen={isCapexModalOpen}
+        onClose={() => setIsCapexModalOpen(false)}
+        machines={machines}
+      />
     </div>
   );
 };

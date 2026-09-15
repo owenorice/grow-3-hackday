@@ -10,6 +10,7 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  Zap,
 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
 
@@ -22,6 +23,9 @@ export const FloorplanView: React.FC = () => {
     appMode,
     toggleMachineStatus,
     toggleMaintenance,
+    circuit,
+    addToCircuit,
+    removeFromCircuit,
   } = useGym();
 
   const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
@@ -86,10 +90,10 @@ export const FloorplanView: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Top Controls: Zone Jump Filters & Status Legend */}
-      <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-[#111111] border-2 border-[#333333] p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
         {/* Zone Selector Buttons */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-          <span className="font-semibold text-slate-400 uppercase tracking-wider text-[11px] mr-1">
+          <span className="font-black text-[#777777] uppercase tracking-wider text-[11px] mr-1">
             Focus:
           </span>
           <button
@@ -97,10 +101,10 @@ export const FloorplanView: React.FC = () => {
               setActiveZoneFilter('all');
               setZoomLevel(1);
             }}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+            className={`px-3 py-1.5 font-bold uppercase tracking-wider transition-all border ${
               activeZoneFilter === 'all'
-                ? isStaff ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+                ? isStaff ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-[#97D700] text-black border-[#97D700]'
+                : 'bg-[#1a1a1a] text-[#AAAAAA] hover:text-white border-[#333333] hover:bg-[#222222]'
             }`}
           >
             All Zones
@@ -114,15 +118,15 @@ export const FloorplanView: React.FC = () => {
                   setActiveZoneFilter(zone);
                   setZoomLevel(1.2);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                className={`px-3 py-1.5 font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap border ${
                   activeZoneFilter === zone
-                    ? isStaff ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'
-                    : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+                    ? isStaff ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-[#97D700] text-black border-[#97D700]'
+                    : 'bg-[#1a1a1a] text-[#AAAAAA] hover:text-white border-[#333333] hover:bg-[#222222]'
                 }`}
               >
                 <span>{zone}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  stats.available > 0 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-red-950 text-red-300'
+                <span className={`text-[10px] px-1.5 py-0.5 font-mono font-bold ${
+                  stats.available > 0 ? 'bg-[#97D700]/20 text-[#97D700] border border-[#97D700]/40' : 'bg-red-950 text-red-300'
                 }`}>
                   {stats.available}/{stats.total} free
                 </span>
@@ -132,73 +136,86 @@ export const FloorplanView: React.FC = () => {
         </div>
 
         {/* Legend Indicators */}
-        <div className="flex items-center gap-3 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800/80">
+        <div className="flex items-center gap-3 bg-black px-3 py-1.5 border border-[#333333]">
           {!isStaff ? (
             <>
-              <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+              <span className="flex items-center gap-1.5 text-[#97D700] font-bold uppercase tracking-wider text-[11px]">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#97D700] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#97D700]"></span>
                 </span>
                 Available
               </span>
-              <span className="flex items-center gap-1.5 text-red-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span> In Use
+              <span className="flex items-center gap-1.5 text-[#DC3545] font-bold uppercase tracking-wider text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-[#DC3545]"></span> In Use
               </span>
-              <span className="flex items-center gap-1.5 text-slate-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-slate-600"></span> Maintenance
+              <span className="flex items-center gap-1.5 text-[#AAAAAA] font-bold uppercase tracking-wider text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-[#555555]"></span> Maintenance
               </span>
             </>
           ) : (
             <>
-              <span className="flex items-center gap-1.5 text-teal-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-teal-500"></span> Healthy
+              <span className="flex items-center gap-1.5 text-[#97D700] font-bold uppercase tracking-wider text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-[#97D700]"></span> Healthy
               </span>
-              <span className="flex items-center gap-1.5 text-amber-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span> Service Due
+              <span className="flex items-center gap-1.5 text-[#FFC107] font-bold uppercase tracking-wider text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-[#FFC107]"></span> Service Due
               </span>
-              <span className="flex items-center gap-1.5 text-red-400 font-medium animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span> Overuse Alert
+              <span className="flex items-center gap-1.5 text-[#DC3545] font-bold uppercase tracking-wider text-[11px] animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-[#DC3545]"></span> Overuse Alert
               </span>
             </>
           )}
         </div>
       </div>
 
+      {/* Interactive Onboarding Hint Banner */}
+      <div className="bg-[#111111] border-l-4 border-[#97D700] border-y border-r border-[#222222] px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2 text-[#CCCCCC]">
+          <Zap className="w-4 h-4 text-[#97D700] shrink-0" />
+          <span>
+            <strong className="text-white uppercase font-black tracking-wider">Interactive Floorplan:</strong> Click any station node on the map to view real-time motor telemetry, current wait times, or add to your sequential workout circuit.
+          </span>
+        </div>
+        <span className="hidden md:inline-block text-[10px] uppercase tracking-widest text-[#777777] font-mono">
+          22 STATIONS MAPPED
+        </span>
+      </div>
+
       {/* Main Floorplan Container */}
-      <div className="relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+      <div className="relative bg-black border-2 border-[#333333] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.9)]">
         {/* Floating Architectural Toolbar (Top Left) */}
-        <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs shadow-lg">
-          <span className="font-bold tracking-wider text-slate-300 uppercase flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Floorplan View
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-[#111111]/90 backdrop-blur-md px-3 py-1.5 border border-[#333333] text-xs shadow-lg uppercase tracking-wider font-bold text-white">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#97D700]"></span> Floorplan View
           </span>
           {activeZoneFilter !== 'all' && (
-            <span className="text-emerald-400 font-semibold">• {activeZoneFilter}</span>
+            <span className="text-[#97D700] font-black">• {activeZoneFilter}</span>
           )}
         </div>
 
         {/* Floating Zoom & Reset Controls (Top Right) */}
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg">
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-[#111111]/90 backdrop-blur-md p-1 border border-[#333333] shadow-lg">
           <button
             onClick={() => handleZoom(0.2)}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#AAAAAA] hover:text-white hover:bg-[#222222] transition-colors"
             title="Zoom In"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
-          <span className="text-[11px] font-mono text-slate-400 px-1 font-semibold">
+          <span className="text-[11px] font-mono text-[#AAAAAA] px-1 font-bold">
             {Math.round(zoomLevel * 100)}%
           </span>
           <button
             onClick={() => handleZoom(-0.2)}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#AAAAAA] hover:text-white hover:bg-[#222222] transition-colors"
             title="Zoom Out"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={resetView}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors border-l border-slate-700/80 pl-2"
+            className="p-1.5 text-[#AAAAAA] hover:text-white hover:bg-[#222222] transition-colors border-l border-[#333333] pl-2"
             title="Reset View"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -659,14 +676,34 @@ export const FloorplanView: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => toggleMachineStatus(selectedMachine.id)}
-                  className={`w-full vg-btn ${
-                    selectedMachine.status === 'available' ? 'vg-btn-3' : 'vg-btn-danger'
-                  }`}
-                >
-                  {selectedMachine.status === 'available' ? "CLAIM THIS STATION" : "RELEASE STATION"}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toggleMachineStatus(selectedMachine.id)}
+                    className={`flex-1 vg-btn ${
+                      selectedMachine.status === 'available' ? 'vg-btn-3' : 'vg-btn-danger'
+                    }`}
+                  >
+                    {selectedMachine.status === 'available' ? "CLAIM STATION" : "RELEASE"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (circuit.stations.some(s => s.machineId === selectedMachine.id)) {
+                        removeFromCircuit(selectedMachine.id);
+                      } else {
+                        addToCircuit(selectedMachine.id);
+                      }
+                    }}
+                    className={`flex-1 vg-btn ${
+                      circuit.stations.some(s => s.machineId === selectedMachine.id)
+                        ? 'vg-btn-1 border-[#97D700] text-[#97D700]'
+                        : 'vg-btn-2'
+                    }`}
+                  >
+                    {circuit.stations.some(s => s.machineId === selectedMachine.id)
+                      ? '✓ IN CIRCUIT'
+                      : '+ ADD TO CIRCUIT'}
+                  </button>
+                </div>
               </div>
             ) : (
               /* Staff View Telemetry & Service Actions */

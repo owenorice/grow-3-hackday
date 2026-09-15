@@ -18,10 +18,10 @@ A high-voltage web application built for **Village Health & Wellness Clubs**, ma
 | Developer | Assigned Issue | Priority | Focus Area | Status |
 |---|---|---|---|---|
 | 👤 **Owen** | **[#8 Athletic Split-Pod Hero](https://github.com/owenorice/grow-3-hackday/issues/8)** & **[#11 UI Beautification](https://github.com/owenorice/grow-3-hackday/issues/11)** & **[#2 SVG Floorplan](https://github.com/owenorice/grow-3-hackday/issues/2)** | `P1` / `P3` | `src/components/layout/` & `floorplan/` | ✅ **SHIPPED** (PRs #7, #13, #14) |
-| 👤 **Oliver** | **[#3 Filterable Equipment Directory](https://github.com/owenorice/grow-3-hackday/issues/3)** & **[#9 Workout Circuit Queue](https://github.com/owenorice/grow-3-hackday/issues/9)** & **[#18 UX Clarity](https://github.com/owenorice/grow-3-hackday/issues/18)** | `P1` / `P2` / `P3` | `src/components/` & store | 🟡 **IN PROGRESS** (Issue #18) |
-| 👤 **Tom** | **[#4 Usage Analytics & Brutalist Telemetry Charts](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2` | `src/components/analytics/` | ✅ **SHIPPED** (PR #15) |
+| 👤 **Oliver** | **[#3 Filterable Equipment Directory](https://github.com/owenorice/grow-3-hackday/issues/3)** & **[#9 Workout Circuit Queue](https://github.com/owenorice/grow-3-hackday/issues/9)** & **[#18 UX Clarity](https://github.com/owenorice/grow-3-hackday/issues/18)** | `P1` / `P2` / `P3` | `src/components/` & store | ✅ **SHIPPED** (PRs #10, #16, Issue #18 resolved) |
+| 👤 **Tom** | **[#4 Usage Analytics & Brutalist Telemetry Charts](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2` | `src/components/analytics/` | ✅ **SHIPPED** (PRs #15, #21) |
 | 👤 **Conor** | **[#6 Staff Maintenance Inspection Modal](https://github.com/owenorice/grow-3-hackday/issues/6)** & **[#5 Demo Simulator Controls](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2` | `src/components/staff/` & `simulator/` | ✅ **SHIPPED** (PRs #5, #17) |
-| 👥 **Team Lead** | **[#22 Capex Export & AI Circuit Optimizer Roadmap](https://github.com/owenorice/grow-3-hackday/issues/22)** | `P4` | Executive Slides & Architecture | 📋 **PLANNED** (Slide Asset Shipped) |
+| 👥 **Team Lead** | **[#22 Capex Export & AI Circuit Optimizer Roadmap](https://github.com/owenorice/grow-3-hackday/issues/22)** | `P4` | Executive Slides & Architecture | 🚀 **IMPLEMENTED** (PR #23) |
 
 ---
 

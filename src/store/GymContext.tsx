@@ -43,6 +43,12 @@ interface GymContextType {
   updateStationTiming: (machineId: string, plannedMinutes: number, restTransitionMinutes: number) => void;
   setCircuitStep: (stepIndex: number) => void;
 
+  // UX Confirmation Toasts & AI Optimizer
+  toast: string | null;
+  showToast: (msg: string) => void;
+  swapCircuitMachine: (oldMachineId: string, newMachineId: string) => void;
+  optimizeCircuitOrder: () => boolean;
+
   // Presenter Simulator Actions
   simulatePeakRush: () => void;
   simulateEmptyGym: () => void;
@@ -73,6 +79,14 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [filterCategory, setFilterCategory] = useState<EquipmentCategory | 'all'>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => {
+      setToast(prev => (prev === msg ? null : prev));
+    }, 3200);
+  };
 
   const [circuit, setCircuit] = useState<WorkoutCircuit>(() => {
     try {
@@ -140,6 +154,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const newStatus = m.status === 'available' ? 'in_use' : 'available';
         const sessionMins = newStatus === 'in_use' ? Math.floor(Math.random() * 20) + 5 : 0;
         const waitMins = newStatus === 'in_use' ? Math.max(1, 30 - sessionMins) : 0;
+        showToast(newStatus === 'in_use' ? `Claimed ${m.code}` : `Freed ${m.code}`);
         return {
           ...m,
           status: newStatus,
@@ -159,6 +174,10 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Staff Maintenance: Reset service hours & mark healthy
   const logService = (id: string, notes?: string, technician: string = 'Staff On Duty') => {
     const today = new Date().toISOString().split('T')[0];
+    const target = machines.find(m => m.id === id);
+    if (target) {
+      showToast(`✓ Inspection logged & cleared for ${target.code}`);
+    }
     setMachines(prev =>
       prev.map(m => {
         if (m.id !== id) return m;
@@ -187,6 +206,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       prev.map(m => {
         if (m.id !== id) return m;
         const nextStatus = m.status === 'maintenance' ? 'available' : 'maintenance';
+        showToast(nextStatus === 'maintenance' ? `Flagged ${m.code} out of service` : `Reopened ${m.code}`);
         return {
           ...m,
           status: nextStatus,
@@ -260,6 +280,8 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addToCircuit = (machineId: string, plannedMinutes = 15, restTransitionMinutes = 2) => {
     setCircuit(prev => {
       if (prev.stations.some(s => s.machineId === machineId)) return prev;
+      const target = machines.find(m => m.id === machineId);
+      showToast(`+ Added ${target?.code || 'station'} to circuit queue`);
       return {
         ...prev,
         stations: [
@@ -276,6 +298,8 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const removeFromCircuit = (machineId: string) => {
+    const target = machines.find(m => m.id === machineId);
+    showToast(`Removed ${target?.code || 'station'} from circuit`);
     setCircuit(prev => {
       const filtered = prev.stations.filter(s => s.machineId !== machineId);
       return {
@@ -306,6 +330,9 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         })
       );
 
+      const target = machines.find(m => m.id === nextStation?.machineId);
+      showToast(`Advanced to ${target?.code || 'next station'}`);
+
       return {
         ...prev,
         currentStepIndex: nextIdx,
@@ -314,6 +341,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const clearCircuit = () => {
+    showToast('Circuit cleared');
     setCircuit(prev => ({
       ...prev,
       currentStepIndex: 0,
@@ -369,6 +397,58 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  const swapCircuitMachine = (oldMachineId: string, newMachineId: string) => {
+    const oldM = machines.find(m => m.id === oldMachineId);
+    const newM = machines.find(m => m.id === newMachineId);
+    setCircuit(prev => ({
+      ...prev,
+      stations: prev.stations.map(s =>
+        s.machineId === oldMachineId ? { ...s, machineId: newMachineId } : s
+      ),
+    }));
+    showToast(`Swapped ${oldM?.code || 'station'} with ${newM?.code || 'alternative'}`);
+  };
+
+  const optimizeCircuitOrder = (): boolean => {
+    if (circuit.stations.length <= 1) {
+      showToast('Add more stations to run AI sequence optimization.');
+      return false;
+    }
+
+    const currentIdx = circuit.currentStepIndex;
+    const completed = circuit.stations.slice(0, currentIdx);
+    const remaining = circuit.stations.slice(currentIdx);
+
+    // Sort remaining stations so available ones come first, busy ones last
+    const sortedRemaining = [...remaining].sort((a, b) => {
+      const mA = machines.find(m => m.id === a.machineId);
+      const mB = machines.find(m => m.id === b.machineId);
+      const scoreA = mA?.status === 'available' ? 0 : mA?.status === 'in_use' ? 1 : 2;
+      const scoreB = mB?.status === 'available' ? 0 : mB?.status === 'in_use' ? 1 : 2;
+      return scoreA - scoreB;
+    });
+
+    const orderChanged = sortedRemaining.some((s, idx) => s.machineId !== remaining[idx].machineId);
+    if (!orderChanged) {
+      showToast('✓ Circuit is already optimized for lowest wait times!');
+      return false;
+    }
+
+    const newStations = [...completed, ...sortedRemaining].map((s, idx) => ({
+      ...s,
+      order: idx + 1,
+    }));
+
+    setCircuit(prev => ({
+      ...prev,
+      stations: newStations,
+    }));
+
+    const firstAvailable = machines.find(m => m.id === sortedRemaining[0]?.machineId);
+    showToast(`⚡ AI Optimized! Prioritized ${firstAvailable?.code || 'station'} to eliminate wait.`);
+    return true;
+  };
+
   return (
     <GymContext.Provider
       value={{
@@ -394,6 +474,8 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logService,
         toggleMaintenance,
 
+        toast,
+        showToast,
         circuit,
         addToCircuit,
         removeFromCircuit,
@@ -402,6 +484,8 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         moveCircuitStation,
         updateStationTiming,
         setCircuitStep,
+        swapCircuitMachine,
+        optimizeCircuitOrder,
 
         simulatePeakRush,
         simulateEmptyGym,
