@@ -23,57 +23,75 @@ npm run build
 
 ---
 
+## 👥 Parallel AI Developer Team Assignments
+
+| Developer | Assigned Issue | Priority | Focus Directory | Git Branch |
+|---|---|---|---|---|
+| 👤 **Owen** | **[#2 Interactive 2D SVG Gym Floorplan & Status Pins](https://github.com/owenorice/grow-3-hackday/issues/2)** | `P1-mvp` | `src/components/floorplan/` | `feature/issue-2-floorplan` |
+| 👤 **Oliver** | **[#3 Filterable Equipment List, Category Dropdown & Quick Actions](https://github.com/owenorice/grow-3-hackday/issues/3)** | `P1-mvp` | `src/components/equipment/` | `feature/issue-3-equipment-list` |
+| 👤 **Tom** | **[#4 Usage Analytics, 24h Peak Curve & Overuse Telemetry](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2-enhancement` | `src/components/analytics/` | `feature/issue-4-analytics` |
+| 👤 **Conor** | **[#6 Staff Maintenance Inspection Modal](https://github.com/owenorice/grow-3-hackday/issues/6)** & **[#5 Presenter Demo Simulator](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2-enhancement` | `src/components/staff/` & `src/components/simulator/` | `feature/issue-6-staff-modal` |
+
+---
+
 ## 🏗️ Architecture & Component Isolation
 
-To enable multiple independent AI agent sessions to develop features concurrently without merge conflicts, work is strictly separated by directory:
+To prevent merge conflicts across parallel AI sessions, each developer owns their isolated directory:
 
 ```
 src/
 ├── types/
-│   └── gym.ts                  # Shared data models (Machines, Zones, Telemetry, Maintenance)
+│   └── gym.ts                  # Shared types & contracts (All read-only)
 ├── data/
-│   └── seedMachines.ts         # 22 pre-seeded machines with coordinates and usage metrics
+│   └── seedMachines.ts         # 22 pre-seeded machines & coordinates
 ├── store/
-│   └── GymContext.tsx          # Central reactive store + LocalStorage persistence + Simulator tools
+│   └── GymContext.tsx          # Central reactive store + simulator triggers
 ├── components/
-│   ├── layout/                 # Header with Guest/Staff switch, Navigation Tabs
-│   ├── floorplan/              # [Issue #2] 2D SVG Interactive Gym Floorplan
-│   ├── equipment/              # [Issue #3] Filterable Equipment Catalog & In-Use Toggles
-│   ├── analytics/              # [Issue #4] Peak Hours Curves & Overuse Dashboard
-│   ├── simulator/              # [Issue #5] Floating Presenter Demo Controls
-│   └── staff/                  # [Issue #6] Staff Maintenance Checklist Modal
+│   ├── layout/                 # Shared Header & Tabs
+│   ├── floorplan/              # [Owen - Issue #2] 2D SVG Floorplan Canvas
+│   ├── equipment/              # [Oliver - Issue #3] Equipment Catalog & Filters
+│   ├── analytics/              # [Tom - Issue #4] Analytics & Overuse Table
+│   ├── staff/                  # [Conor - Issue #6] Staff Inspection Modal
+│   └── simulator/              # [Conor - Issue #5] Floating Presenter Demo Bar
 └── App.tsx                     # Top-level shell
 ```
 
 ---
 
-## 📋 Multi-Agent GitHub Issue Tickets
+## 🤖 AI Session Quick-Start Instructions
 
-| Issue | Priority | Title | Focus Directory | Recommended Branch |
-|---|---|---|---|---|
-| **[#1](https://github.com/owenorice/grow-3-hackday/issues/1)** | `P0-foundation` | Base Scaffold, Types, Mock Store & Staff/Guest Shell | `src/types/`, `src/store/` | `main` (Shipped ✅) |
-| **[#2](https://github.com/owenorice/grow-3-hackday/issues/2)** | `P1-mvp` | Interactive 2D SVG Gym Floorplan & Status Pins | `src/components/floorplan/` | `feature/issue-2-floorplan` |
-| **[#3](https://github.com/owenorice/grow-3-hackday/issues/3)** | `P1-mvp` | Filterable Equipment List, Category Dropdown & Quick Actions | `src/components/equipment/` | `feature/issue-3-equipment-list` |
-| **[#4](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2-enhancement` | Usage Analytics, 24h Peak Curve & Overuse Telemetry | `src/components/analytics/` | `feature/issue-4-analytics` |
-| **[#5](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2-enhancement` | Presenter Demo Simulator Controls & Rush Triggers | `src/components/simulator/` | `feature/issue-5-demo-simulator` |
-| **[#6](https://github.com/owenorice/grow-3-hackday/issues/6)** | `P2-enhancement` | Staff Maintenance Inspection Modal & Service Checklist | `src/components/staff/` | `feature/issue-6-staff-modal` |
+### For Owen (`assignee:owen`):
+```bash
+git checkout main && git pull origin main
+git checkout -b feature/issue-2-floorplan
+# Work in src/components/floorplan/FloorplanView.tsx
+npm run build
+gh pr create --title "[#2] Interactive 2D Floorplan Polish" --body "Resolves #2"
+```
 
----
+### For Oliver (`assignee:oliver`):
+```bash
+git checkout main && git pull origin main
+git checkout -b feature/issue-3-equipment-list
+# Work in src/components/equipment/EquipmentListView.tsx
+npm run build
+gh pr create --title "[#3] Filterable Equipment List & Quick Actions" --body "Resolves #3"
+```
 
-## 🤖 Instructions for AI Agent Sessions
+### For Tom (`assignee:tom`):
+```bash
+git checkout main && git pull origin main
+git checkout -b feature/issue-4-analytics
+# Work in src/components/analytics/AnalyticsView.tsx
+npm run build
+gh pr create --title "[#4] Usage Analytics & Overuse Telemetry" --body "Resolves #4"
+```
 
-1. **Pick an Issue from the table above**.
-2. **Create your feature branch**:
-   ```bash
-   git checkout -b feature/issue-<ID>-<name>
-   ```
-3. **Develop within your designated component folder** to prevent merge conflicts with other agents.
-4. **Use the shared store**: Import `useGym()` from `../../store/GymContext` for all machine states, toggle actions, and simulator triggers.
-5. **Verify your build**:
-   ```bash
-   npm run build
-   ```
-6. **Open a Pull Request**:
-   ```bash
-   gh pr create --title "[#<ID>] Feature Name" --body "Resolves #<ID>"
-   ```
+### For Conor (`assignee:conor`):
+```bash
+git checkout main && git pull origin main
+git checkout -b feature/issue-6-staff-modal
+# Work in src/components/staff/ and src/components/simulator/
+npm run build
+gh pr create --title "[#6] Staff Maintenance Inspection Modal & Demo Controls" --body "Resolves #6 and #5"
+```
