@@ -56,3 +56,17 @@ export interface GymSummaryStats {
   serviceDueCount: number;
   criticalOveruseCount: number;
 }
+
+export interface CircuitStation {
+  machineId: string;
+  order: number;
+  plannedMinutes: number; // e.g. 15 min planned
+  restTransitionMinutes: number; // e.g. 2 min walking/wipe down
+}
+
+export interface WorkoutCircuit {
+  id: string;
+  name: string;
+  currentStepIndex: number; // active station in circuit
+  stations: CircuitStation[];
+}

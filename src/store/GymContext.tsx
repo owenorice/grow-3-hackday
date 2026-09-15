@@ -5,6 +5,7 @@ import {
   ActiveTab,
   EquipmentCategory,
   GymSummaryStats,
+  WorkoutCircuit,
 } from '../types/gym';
 import { SEED_MACHINES } from '../data/seedMachines';
 
@@ -31,6 +32,13 @@ interface GymContextType {
   setMachineStatus: (id: string, status: GymMachine['status']) => void;
   logService: (id: string, notes?: string) => void;
   toggleMaintenance: (id: string) => void;
+
+  // Circuit Queue & Sequential Reservation
+  circuit: WorkoutCircuit;
+  addToCircuit: (machineId: string, plannedMinutes?: number, restTransitionMinutes?: number) => void;
+  removeFromCircuit: (machineId: string) => void;
+  advanceCircuit: () => void;
+  clearCircuit: () => void;
 
   // Presenter Simulator Actions
   simulatePeakRush: () => void;
@@ -63,6 +71,25 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [showAvailableOnly, setShowAvailableOnly] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const [circuit, setCircuit] = useState<WorkoutCircuit>(() => {
+    try {
+      const saved = localStorage.getItem('village_gym_circuit_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load circuit', e);
+    }
+    return {
+      id: 'default-circuit',
+      name: "TODAY'S WORKOUT CIRCUIT",
+      currentStepIndex: 0,
+      stations: [
+        { machineId: 'm-tm-01', order: 1, plannedMinutes: 15, restTransitionMinutes: 2 },
+        { machineId: 'm-pr-01', order: 2, plannedMinutes: 20, restTransitionMinutes: 3 },
+        { machineId: 'm-cc-01', order: 3, plannedMinutes: 15, restTransitionMinutes: 2 },
+      ],
+    };
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(machines));
@@ -70,6 +97,14 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error('Failed to cache machines to localStorage', e);
     }
   }, [machines]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('village_gym_circuit_v1', JSON.stringify(circuit));
+    } catch (e) {
+      console.error('Failed to cache circuit', e);
+    }
+  }, [circuit]);
 
   const selectedMachine = useMemo(() => {
     return machines.find(m => m.id === selectedMachineId) || null;
@@ -219,6 +254,70 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const addToCircuit = (machineId: string, plannedMinutes = 15, restTransitionMinutes = 2) => {
+    setCircuit(prev => {
+      if (prev.stations.some(s => s.machineId === machineId)) return prev;
+      return {
+        ...prev,
+        stations: [
+          ...prev.stations,
+          {
+            machineId,
+            order: prev.stations.length + 1,
+            plannedMinutes,
+            restTransitionMinutes,
+          },
+        ],
+      };
+    });
+  };
+
+  const removeFromCircuit = (machineId: string) => {
+    setCircuit(prev => {
+      const filtered = prev.stations.filter(s => s.machineId !== machineId);
+      return {
+        ...prev,
+        currentStepIndex: Math.min(prev.currentStepIndex, Math.max(0, filtered.length - 1)),
+        stations: filtered.map((s, idx) => ({ ...s, order: idx + 1 })),
+      };
+    });
+  };
+
+  const advanceCircuit = () => {
+    setCircuit(prev => {
+      if (prev.stations.length === 0) return prev;
+      const currentStation = prev.stations[prev.currentStepIndex];
+      const nextIdx = (prev.currentStepIndex + 1) % prev.stations.length;
+      const nextStation = prev.stations[nextIdx];
+
+      // Auto-update machine states: free up previous, claim next
+      setMachines(currentMachines =>
+        currentMachines.map(m => {
+          if (m.id === currentStation?.machineId) {
+            return { ...m, status: 'available', currentSessionMinutes: 0 };
+          }
+          if (m.id === nextStation?.machineId) {
+            return { ...m, status: 'in_use', currentSessionMinutes: 1 };
+          }
+          return m;
+        })
+      );
+
+      return {
+        ...prev,
+        currentStepIndex: nextIdx,
+      };
+    });
+  };
+
+  const clearCircuit = () => {
+    setCircuit(prev => ({
+      ...prev,
+      currentStepIndex: 0,
+      stations: [],
+    }));
+  };
+
   return (
     <GymContext.Provider
       value={{
@@ -243,6 +342,12 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setMachineStatus,
         logService,
         toggleMaintenance,
+
+        circuit,
+        addToCircuit,
+        removeFromCircuit,
+        advanceCircuit,
+        clearCircuit,
 
         simulatePeakRush,
         simulateEmptyGym,
