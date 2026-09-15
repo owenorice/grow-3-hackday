@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGym } from '../../store/GymContext';
-import { BarChart3, TrendingUp, Clock, Wrench, ShieldAlert } from 'lucide-react';
+import { TrendingUp, Clock, Wrench, ShieldAlert, Zap, Dumbbell, BarChart2 } from 'lucide-react';
 
 export const AnalyticsView: React.FC = () => {
   const { machines, appMode, logService } = useGym();
   const isStaff = appMode === 'staff';
+  const [hoveredHour, setHoveredHour] = useState<{ hour: number; avg: number } | null>(null);
 
   // Sort machines by utilization
   const mostUsed = [...machines].sort((a, b) => b.utilizationPercentage - a.utilizationPercentage);
@@ -21,168 +22,266 @@ export const AnalyticsView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Top Insights Cards */}
+    <div className="space-y-8 animate-in fade-in duration-300">
+      
+      {/* ================= SECTION 1: TOP ATHLETIC INSIGHT PODS ================= */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
-            <Clock className="w-4 h-4" /> Optimal Workout Window
+        {/* Pod 1: Optimal Workout Window */}
+        <div className="bg-black border-2 border-[#333333] hover:border-[#97D700] p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-[#97D700]" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-[#97D700] mb-2">
+            <span className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4" /> OPTIMAL WINDOW
+            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#97D700]/10 border border-[#97D700] text-[#97D700]">LOW TRAFFIC</span>
           </div>
-          <div className="text-xl font-bold text-white">13:30 – 15:30</div>
-          <p className="text-xs text-slate-400 mt-1">Average gym occupancy is lowest at 28% capacity during early afternoon.</p>
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            13:30 – 15:30
+          </div>
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Floor traffic drops to <span className="text-[#97D700] font-bold">28% capacity</span> during early afternoon. Best time for undisturbed rack circuits.
+          </p>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-          <div className="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">
-            <TrendingUp className="w-4 h-4" /> Peak Rush Hours
+        {/* Pod 2: Peak Rush Hours */}
+        <div className="bg-black border-2 border-[#333333] hover:border-[#DC3545] p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-[#DC3545]" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-[#DC3545] mb-2">
+            <span className="flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4" /> PEAK RUSH
+            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#DC3545]/10 border border-[#DC3545] text-[#DC3545]">85%+ BUSY</span>
           </div>
-          <div className="text-xl font-bold text-white">17:00 – 19:45</div>
-          <p className="text-xs text-slate-400 mt-1">Squat racks and cable towers reach 95%+ utilization after hotel business hours.</p>
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            17:00 – 19:45
+          </div>
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Power racks and dual cable towers surge to <span className="text-[#DC3545] font-bold">95%+ occupancy</span>. Pre-reserve circuits in advance.
+          </p>
         </div>
 
-        <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-          <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider mb-1">
-            <BarChart3 className="w-4 h-4" /> Average Station Duration
+        {/* Pod 3: Station Duration */}
+        <div className="bg-black border-2 border-[#333333] hover:border-white p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-white" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-white mb-2">
+            <span className="flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-[#97D700]" /> AVG WORKOUT PACE
+            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#212529] border border-[#333333] text-[#AAAAAA]">ESTIMATED</span>
           </div>
-          <div className="text-xl font-bold text-white">22 Minutes</div>
-          <p className="text-xs text-slate-400 mt-1">Power racks average 32 mins, while cardio machines average 24 mins.</p>
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            22 MINS
+          </div>
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Power racks average 32 mins, while cardio machines turnover every 24 mins. Transition buffer averages 2 mins.
+          </p>
         </div>
       </div>
 
-      {/* Staff Overuse & Maintenance Telemetry Table */}
+      {/* ================= SECTION 2: STAFF OVERUSE & TELEMETRY ================= */}
       {isStaff && (
-        <div className="bg-slate-900/90 rounded-xl border border-amber-800/60 p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center">
-                <ShieldAlert className="w-5 h-5" />
+        <div className="bg-black border-2 border-[#DC3545] p-6 space-y-5 relative shadow-[0_0_40px_rgba(220,53,69,0.15)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b-2 border-[#212529]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#DC3545]/20 text-[#DC3545] border-2 border-[#DC3545] flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-sm text-white">Machine Overuse & Preventative Inspection Telemetry</h3>
-                <p className="text-xs text-slate-400">Automated threshold tracking based on machine usage cycles and operating hours</p>
+                <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px]">
+                  MACHINE OVERUSE & PREVENTATIVE SERVICE TELEMETRY
+                </h3>
+                <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+                  Automated threshold monitoring based on cumulative motor hours & cable load cycles
+                </p>
               </div>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded bg-amber-950 text-amber-300 border border-amber-800">
-              {overdueMachines.length} Action Required
+            <span className="self-start sm:self-auto px-3 py-1.5 font-black uppercase tracking-[2px] text-xs bg-[#DC3545] text-white border border-[#DC3545]">
+              {overdueMachines.length} ACTION REQUIRED
             </span>
           </div>
 
-          <div className="divide-y divide-slate-800 border border-slate-800 rounded-lg overflow-hidden bg-slate-950/60">
-            {overdueMachines.map(m => (
-              <div key={m.id} className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-900/40">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-white">
-                      {m.code}
-                    </span>
-                    <span className="font-semibold text-sm text-slate-200">{m.name}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                      m.maintenanceStatus === 'critical_overuse'
-                        ? 'bg-red-950 text-red-300 border border-red-700'
-                        : 'bg-amber-950 text-amber-300 border border-amber-700'
-                    }`}>
-                      {m.maintenanceStatus === 'critical_overuse' ? 'Critical Overuse' : 'Service Due'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-amber-300/90">{m.serviceNotes}</p>
-                  <p className="text-[11px] text-slate-500">
-                    Logged: {m.hoursSinceLastService}h operational since {m.lastServicedDate} (Limit: {m.serviceThresholdHours}h)
-                  </p>
-                </div>
+          {overdueMachines.length === 0 ? (
+            <div className="p-6 text-center border-2 border-[#222222] bg-[#111111]">
+              <p className="text-sm font-bold uppercase tracking-[2px] text-[#97D700]">
+                ✓ ALL 22 GYM STATIONS HEALTHY — ZERO OVERDUE THRESHOLDS
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {overdueMachines.map(m => (
+                <div
+                  key={m.id}
+                  className="p-4 bg-[#111111] border-2 border-[#333333] hover:border-[#DC3545] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-display font-black text-xs px-2.5 py-1 bg-black text-[#97D700] border border-[#333333]">
+                        {m.code}
+                      </span>
+                      <span className="font-display font-black text-sm uppercase tracking-wider text-white">
+                        {m.name}
+                      </span>
+                      <span className={`text-[10px] font-black px-2 py-0.5 uppercase tracking-wider border ${
+                        m.maintenanceStatus === 'critical_overuse'
+                          ? 'bg-[#DC3545]/20 text-[#DC3545] border-[#DC3545]'
+                          : 'bg-[#FFC107]/20 text-[#FFC107] border-[#FFC107]'
+                      }`}>
+                        {m.maintenanceStatus === 'critical_overuse' ? 'CRITICAL OVERUSE' : 'SERVICE DUE'}
+                      </span>
+                    </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => logService(m.id)}
-                    className="py-1.5 px-3 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-1.5 shadow"
-                  >
-                    <Wrench className="w-3.5 h-3.5" /> Log Service & Clear
-                  </button>
+                    <p className="text-xs font-semibold text-[#FFC107] leading-relaxed">
+                      {m.serviceNotes}
+                    </p>
+
+                    <div className="flex items-center gap-4 text-[11px] text-[#888888] font-mono">
+                      <span>OPERATING: <strong className="text-white">{m.hoursSinceLastService}h</strong> / {m.serviceThresholdHours}h LIMIT</span>
+                      <span>LAST SERVICED: <strong className="text-white">{m.lastServicedDate}</strong></span>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0">
+                    <button
+                      onClick={() => logService(m.id)}
+                      className="vg-btn vg-btn-3 text-xs px-4 py-2.5 tracking-wider w-full md:w-auto"
+                    >
+                      <Wrench className="w-3.5 h-3.5 mr-1" />
+                      LOG SERVICE & CLEAR
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* 24-Hour Peak Usage Histogram Curve */}
-      <div className="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between">
+      {/* ================= SECTION 3: 24-HOUR BUSYNESS CURVE ================= */}
+      <div className="bg-black border-2 border-[#333333] p-6 space-y-5 shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-[#212529]">
           <div>
-            <h3 className="font-bold text-sm text-white">24-Hour Facility Busyness Curve</h3>
-            <p className="text-xs text-slate-400">Aggregated equipment utilization across the entire gym facility</p>
+            <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px] flex items-center gap-2">
+              <BarChart2 className="w-5 h-5 text-[#97D700]" />
+              24-HOUR PEAK TRAFFIC HISTOGRAM
+            </h3>
+            <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+              Aggregated live sensor load across cardio, strength, and turf zones
+            </p>
           </div>
-          <span className="text-xs text-slate-400 font-mono">06:00 - 23:00 View</span>
+          <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-wider">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#97D700]" /> LOW (&lt;50%)</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#9FC63B]" /> MODERATE</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#DC3545]" /> PEAK (&gt;75%)</span>
+          </div>
         </div>
 
         {/* Bar chart representation */}
-        <div className="h-44 flex items-end gap-1.5 pt-6 pb-2 px-1">
-          {hourlyAverages.slice(6, 23).map((avg, i) => {
-            const hour = i + 6;
-            const hourStr = `${hour.toString().padStart(2, '0')}:00`;
-            const isPeak = avg >= 75;
+        <div className="relative pt-8 pb-2">
+          {/* Active Hover Floating Readout */}
+          {hoveredHour && (
+            <div className="absolute top-0 right-2 px-3 py-1 bg-black border-2 border-[#97D700] text-xs font-black uppercase tracking-[2px] text-white">
+              {hoveredHour.hour.toString().padStart(2, '0')}:00 ➔ <span className="text-[#97D700]">{hoveredHour.avg}% OCCUPANCY</span>
+            </div>
+          )}
 
-            return (
-              <div key={hour} className="flex-1 flex flex-col items-center h-full justify-end group relative">
-                {/* Tooltip */}
-                <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[10px] font-mono px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap z-10">
-                  {hourStr}: {avg}% busy
-                </div>
+          <div className="h-52 flex items-end gap-1 sm:gap-2 px-2 border-b-2 border-[#333333]">
+            {hourlyAverages.slice(6, 23).map((avg, i) => {
+              const hour = i + 6;
+              const isPeak = avg >= 75;
+              const isModerate = avg >= 50 && avg < 75;
 
-                {/* Bar */}
+              return (
                 <div
-                  className={`w-full rounded-t transition-all duration-300 ${
-                    isPeak
-                      ? 'bg-red-500 group-hover:bg-red-400'
-                      : avg >= 50
-                      ? 'bg-amber-500 group-hover:bg-amber-400'
-                      : 'bg-emerald-500 group-hover:bg-emerald-400'
-                  }`}
-                  style={{ height: `${Math.max(6, avg)}%` }}
-                />
-                <span className="text-[9px] text-slate-500 font-mono mt-2 truncate w-full text-center">
-                  {hour}h
-                </span>
-              </div>
-            );
-          })}
+                  key={hour}
+                  onMouseEnter={() => setHoveredHour({ hour, avg })}
+                  onMouseLeave={() => setHoveredHour(null)}
+                  className="flex-1 flex flex-col items-center h-full justify-end cursor-pointer group"
+                >
+                  {/* Bar */}
+                  <div
+                    className={`w-full transition-all duration-200 border-t-2 ${
+                      isPeak
+                        ? 'bg-[#DC3545] border-white group-hover:brightness-125'
+                        : isModerate
+                        ? 'bg-[#9FC63B] border-white group-hover:brightness-125'
+                        : 'bg-[#97D700] border-white group-hover:brightness-125'
+                    }`}
+                    style={{ height: `${Math.max(8, avg)}%` }}
+                  />
+
+                  {/* Hour Label */}
+                  <span className="text-[10px] text-[#777777] group-hover:text-white font-mono mt-2 truncate w-full text-center transition-colors">
+                    {hour}h
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Equipment Utilization Leaderboard */}
-      <div className="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-sm text-white">Equipment Utilization Leaderboard</h3>
-          <span className="text-xs text-slate-400">Ranked by Daily Operating Hours</span>
+      {/* ================= SECTION 4: EQUIPMENT UTILIZATION LEADERBOARD ================= */}
+      <div className="bg-black border-2 border-[#333333] p-6 space-y-5 shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-[#212529]">
+          <div>
+            <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px] flex items-center gap-2">
+              <Dumbbell className="w-5 h-5 text-[#97D700]" />
+              EQUIPMENT UTILIZATION LEADERBOARD
+            </h3>
+            <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+              Top stations ranked by cumulative daily operational hours
+            </p>
+          </div>
+          <span className="text-xs text-[#888888] font-mono uppercase tracking-widest">
+            RANKED 1 - 7
+          </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {mostUsed.slice(0, 7).map((m, idx) => (
-            <div key={m.id} className="flex items-center gap-3 text-xs">
-              <span className="font-mono text-slate-500 font-bold w-4 text-center">#{idx + 1}</span>
-              <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px]">
+            <div
+              key={m.id}
+              className="p-3 bg-[#111111] border-2 border-[#222222] hover:border-[#333333] flex items-center gap-3 text-xs transition-colors"
+            >
+              <span className="font-display font-black text-sm text-[#555555] w-6 text-center">
+                #{idx + 1}
+              </span>
+              <span className="font-display font-black px-2 py-0.5 bg-black text-[#97D700] border border-[#333333] text-xs">
                 {m.code}
               </span>
-              <span className="font-medium text-slate-200 flex-1 truncate">{m.name}</span>
-              <span className="text-slate-400 hidden md:inline">{m.avgDailyUsageHours} hrs/day</span>
-              <div className="w-24 md:w-36 bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${
-                    m.utilizationPercentage >= 85
-                      ? 'bg-red-500'
-                      : m.utilizationPercentage >= 70
-                      ? 'bg-amber-500'
-                      : 'bg-emerald-500'
-                  }`}
-                  style={{ width: `${m.utilizationPercentage}%` }}
-                />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="font-display font-bold uppercase tracking-wider text-white truncate">
+                    {m.name}
+                  </span>
+                  <span className="text-[#AAAAAA] font-mono text-[11px] ml-2 shrink-0">
+                    {m.avgDailyUsageHours}h/day
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full bg-black h-2.5 border border-[#333333] mt-1.5 overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ${
+                      m.utilizationPercentage >= 85
+                        ? 'bg-[#DC3545]'
+                        : m.utilizationPercentage >= 70
+                        ? 'bg-[#9FC63B]'
+                        : 'bg-[#97D700]'
+                    }`}
+                    style={{ width: `${m.utilizationPercentage}%` }}
+                  />
+                </div>
               </div>
-              <span className="font-mono font-bold text-slate-300 w-10 text-right">
+
+              <span className="font-display font-black text-sm text-white w-12 text-right">
                 {m.utilizationPercentage}%
               </span>
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 };
