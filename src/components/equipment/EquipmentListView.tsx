@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useGym } from '../../store/GymContext';
 import { EquipmentCategory, GymMachine, GymZone } from '../../types/gym';
-import { ServiceModal } from '../staff/ServiceModal';
 import {
   Search,
   Filter,
@@ -23,6 +22,7 @@ import {
   SlidersHorizontal,
   Check,
 } from 'lucide-react';
+import { ServiceModal } from '../staff/ServiceModal';
 
 type SortOption = 'code' | 'name' | 'availability' | 'utilization' | 'service_urgency';
 
@@ -700,18 +700,17 @@ export const EquipmentListView: React.FC = () => {
         })}
       </div>
 
-      {/* Staff Safety Inspection Modal */}
-      <ServiceModal
-        machineId={loggingServiceId}
-        isOpen={loggingServiceId !== null}
-        onClose={() => setLoggingServiceId(null)}
-        onServiceSuccess={id => {
-          setRecentlyServicedId(id);
-          setTimeout(() => {
-            setRecentlyServicedId(prev => (prev === id ? null : prev));
-          }, 3500);
-        }}
-      />
+      {/* Staff Maintenance Inspection Modal */}
+      {loggingServiceId && (
+        <ServiceModal
+          machine={machines.find(m => m.id === loggingServiceId) || null}
+          onClose={() => setLoggingServiceId(null)}
+          onServiced={(id) => {
+            setRecentlyServicedId(id);
+            setTimeout(() => setRecentlyServicedId(prev => (prev === id ? null : prev)), 3000);
+          }}
+        />
+      )}
     </div>
   );
 };

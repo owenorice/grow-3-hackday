@@ -1,29 +1,14 @@
 import React, { useState } from 'react';
 import { useGym } from '../../store/GymContext';
-import {
-  BarChart3,
-  TrendingUp,
-  Clock,
-  Wrench,
-  ShieldAlert,
-  Flame,
-  Dumbbell,
-  HeartPulse,
-  Layers,
-  Sparkles,
-  ShieldCheck,
-  Activity,
-  AlertTriangle,
-} from 'lucide-react';
-import { EquipmentCategory } from '../../types/gym';
+import { GymMachine } from '../../types/gym';
+import { TrendingUp, Clock, Wrench, ShieldAlert, Zap, Dumbbell, BarChart2 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
 
 export const AnalyticsView: React.FC = () => {
   const { machines, appMode } = useGym();
   const isStaff = appMode === 'staff';
-
-  const [inspectingMachineId, setInspectingMachineId] = useState<string | null>(null);
   const [hoveredHour, setHoveredHour] = useState<{ hour: number; avg: number } | null>(null);
+  const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
 
   // Sort machines by utilization
   const mostUsed = [...machines].sort((a, b) => b.utilizationPercentage - a.utilizationPercentage);
@@ -33,180 +18,138 @@ export const AnalyticsView: React.FC = () => {
     m => m.maintenanceStatus === 'critical_overuse' || m.maintenanceStatus === 'service_due'
   );
 
-  // Fleet health score
-  const healthyCount = machines.filter(m => m.maintenanceStatus === 'healthy').length;
-  const fleetHealthScore = Math.round((healthyCount / (machines.length || 1)) * 100);
-
   // Aggregated hourly usage across all machines (0 to 23 hours)
   const hourlyAverages = Array.from({ length: 24 }, (_, hour) => {
     const total = machines.reduce((sum, m) => sum + (m.hourlyUsage[hour] || 0), 0);
-    return Math.round(total / (machines.length || 1));
+    return Math.round(total / machines.length);
   });
 
-  const getCategoryIcon = (category: EquipmentCategory) => {
-    switch (category) {
-      case 'cardio':
-        return <HeartPulse className="w-3.5 h-3.5 text-[#97D700]" />;
-      case 'racks_benches':
-        return <Dumbbell className="w-3.5 h-3.5 text-sky-400" />;
-      case 'cables_plate':
-        return <Layers className="w-3.5 h-3.5 text-indigo-400" />;
-      case 'free_weights':
-        return <Flame className="w-3.5 h-3.5 text-amber-400" />;
-      default:
-        return <Sparkles className="w-3.5 h-3.5 text-[#97D700]" />;
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Top Insights Cards (Village Gym Brutalist Pods) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Optimal Workout Window */}
-        <div className="bg-black p-5 border-2 border-[#222222] relative group hover:border-[#97D700] transition-colors">
-          <div className="flex items-center justify-between text-xs font-black text-[#97D700] uppercase tracking-[2px] mb-2">
+    <div className="space-y-8 animate-in fade-in duration-300">
+      
+      {/* ================= SECTION 1: TOP ATHLETIC INSIGHT PODS ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Pod 1: Optimal Workout Window */}
+        <div className="bg-black border-2 border-[#333333] hover:border-[#97D700] p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-[#97D700]" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-[#97D700] mb-2">
             <span className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-[#97D700]" />
-              OPTIMAL WINDOW
+              <Clock className="w-4 h-4" /> OPTIMAL WINDOW
             </span>
-            <span className="text-[10px] bg-[#111111] px-1.5 py-0.5 text-[#97D700] border border-[#97D700]/40">
-              LOW TRAFFIC
-            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#97D700]/10 border border-[#97D700] text-[#97D700]">LOW TRAFFIC</span>
           </div>
-          <div className="text-2xl font-black text-white font-mono tracking-tight">13:30 – 15:30</div>
-          <p className="text-xs text-[#AAAAAA] mt-2 uppercase tracking-[0.5px] leading-relaxed">
-            Floor occupancy averages 28% capacity during early afternoon lull.
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            13:30 – 15:30
+          </div>
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Floor traffic drops to <span className="text-[#97D700] font-bold">28% capacity</span> during early afternoon. Best time for undisturbed rack circuits.
           </p>
         </div>
 
-        {/* Peak Rush Hours */}
-        <div className="bg-black p-5 border-2 border-[#222222] relative group hover:border-[#DC3545] transition-colors">
-          <div className="flex items-center justify-between text-xs font-black text-[#DC3545] uppercase tracking-[2px] mb-2">
+        {/* Pod 2: Peak Rush Hours */}
+        <div className="bg-black border-2 border-[#333333] hover:border-[#DC3545] p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-[#DC3545]" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-[#DC3545] mb-2">
             <span className="flex items-center gap-1.5">
-              <TrendingUp className="w-4 h-4 text-[#DC3545]" />
-              PEAK RUSH
+              <TrendingUp className="w-4 h-4" /> PEAK RUSH
             </span>
-            <span className="text-[10px] bg-red-950/80 px-1.5 py-0.5 text-red-400 border border-red-800">
-              HIGH RUSH
-            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#DC3545]/10 border border-[#DC3545] text-[#DC3545]">85%+ BUSY</span>
           </div>
-          <div className="text-2xl font-black text-white font-mono tracking-tight">17:00 – 19:45</div>
-          <p className="text-xs text-[#AAAAAA] mt-2 uppercase tracking-[0.5px] leading-relaxed">
-            Squat racks and cable towers reach 95%+ occupancy after business hours.
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            17:00 – 19:45
+          </div>
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Power racks and dual cable towers surge to <span className="text-[#DC3545] font-bold">95%+ occupancy</span>. Pre-reserve circuits in advance.
           </p>
         </div>
 
-        {/* Average Station Duration */}
-        <div className="bg-black p-5 border-2 border-[#222222] relative group hover:border-sky-400 transition-colors">
-          <div className="flex items-center justify-between text-xs font-black text-sky-400 uppercase tracking-[2px] mb-2">
+        {/* Pod 3: Station Duration */}
+        <div className="bg-black border-2 border-[#333333] hover:border-white p-5 relative overflow-hidden transition-all shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-white" />
+          <div className="flex items-center justify-between text-xs font-black uppercase tracking-[2px] text-white mb-2">
             <span className="flex items-center gap-1.5">
-              <BarChart3 className="w-4 h-4 text-sky-400" />
-              STATION DURATION
+              <Zap className="w-4 h-4 text-[#97D700]" /> AVG WORKOUT PACE
             </span>
-            <span className="text-[10px] bg-[#111111] px-1.5 py-0.5 text-sky-400 border border-sky-400/40">
-              AVG
-            </span>
+            <span className="text-[10px] px-2 py-0.5 bg-[#212529] border border-[#333333] text-[#AAAAAA]">ESTIMATED</span>
           </div>
-          <div className="text-2xl font-black text-white font-mono tracking-tight">22 MINUTES</div>
-          <p className="text-xs text-[#AAAAAA] mt-2 uppercase tracking-[0.5px] leading-relaxed">
-            Power racks average 32 mins, while cardio deck averages 24 mins.
-          </p>
-        </div>
-
-        {/* Facility Fleet Health Score */}
-        <div className="bg-black p-5 border-2 border-[#222222] relative group hover:border-[#97D700] transition-colors">
-          <div className="flex items-center justify-between text-xs font-black text-[#97D700] uppercase tracking-[2px] mb-2">
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#97D700]" />
-              FLEET SAFETY
-            </span>
-            <span className="text-[10px] bg-emerald-950 px-1.5 py-0.5 text-emerald-400 border border-emerald-800">
-              {healthyCount}/{machines.length} HEALTHY
-            </span>
+          <div className="text-3xl font-black text-white font-display tracking-wider">
+            22 MINS
           </div>
-          <div className="text-2xl font-black text-white font-mono tracking-tight">{fleetHealthScore}% SCORE</div>
-          <p className="text-xs text-[#AAAAAA] mt-2 uppercase tracking-[0.5px] leading-relaxed">
-            Cumulative preventative compliance across all 4 club fitness zones.
+          <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
+            Power racks average 32 mins, while cardio machines turnover every 24 mins. Transition buffer averages 2 mins.
           </p>
         </div>
       </div>
 
-      {/* Staff Overuse & Maintenance Telemetry Table */}
+      {/* ================= SECTION 2: STAFF OVERUSE & TELEMETRY ================= */}
       {isStaff && (
-        <div className="bg-black border-2 border-[#DC3545] p-5 space-y-4 shadow-[0_0_25px_rgba(220,53,69,0.15)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#222222] pb-3">
+        <div className="bg-black border-2 border-[#DC3545] p-6 space-y-5 relative shadow-[0_0_40px_rgba(220,53,69,0.15)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b-2 border-[#212529]">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#DC3545] text-white flex items-center justify-center font-black">
-                <ShieldAlert className="w-5 h-5" />
+              <div className="w-10 h-10 bg-[#DC3545]/20 text-[#DC3545] border-2 border-[#DC3545] flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-black text-sm uppercase tracking-[2px] text-white">
-                  MACHINE OVERUSE & PREVENTATIVE INSPECTION TELEMETRY
+                <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px]">
+                  MACHINE OVERUSE & PREVENTATIVE SERVICE TELEMETRY
                 </h3>
-                <p className="text-xs text-[#AAAAAA] uppercase tracking-[1px]">
-                  Automated cycle tracking exceeding safety thresholds
+                <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+                  Automated threshold monitoring based on cumulative motor hours & cable load cycles
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase tracking-[1px] px-3 py-1 bg-red-950 text-red-300 border border-red-800">
-                {overdueMachines.length} ACTION REQUIRED
-              </span>
-            </div>
+            <span className="self-start sm:self-auto px-3 py-1.5 font-black uppercase tracking-[2px] text-xs bg-[#DC3545] text-white border border-[#DC3545]">
+              {overdueMachines.length} ACTION REQUIRED
+            </span>
           </div>
 
           {overdueMachines.length === 0 ? (
-            <div className="py-8 text-center space-y-2">
-              <ShieldCheck className="w-8 h-8 text-[#97D700] mx-auto" />
-              <p className="text-xs uppercase tracking-[2px] text-white font-black">
-                All machines operating within safety thresholds
-              </p>
-              <p className="text-[11px] text-[#777777]">
-                No equipment currently requires immediate preventative maintenance sign-off.
+            <div className="p-6 text-center border-2 border-[#222222] bg-[#111111]">
+              <p className="text-sm font-bold uppercase tracking-[2px] text-[#97D700]">
+                ✓ ALL 22 GYM STATIONS HEALTHY — ZERO OVERDUE THRESHOLDS
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#222222] border border-[#222222] bg-[#0a0a0a]">
+            <div className="space-y-3">
               {overdueMachines.map(m => (
                 <div
                   key={m.id}
-                  className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#111111] transition-colors"
+                  className="p-4 bg-[#111111] border-2 border-[#333333] hover:border-[#DC3545] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors"
                 >
-                  <div className="space-y-1.5 flex-1">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="font-mono text-xs font-bold px-2 py-0.5 bg-black border border-[#333333] text-[#97D700]">
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-display font-black text-xs px-2.5 py-1 bg-black text-[#97D700] border border-[#333333]">
                         {m.code}
                       </span>
-                      <span className="font-black text-sm uppercase tracking-[0.5px] text-white">{m.name}</span>
-                      <span className="text-[10px] text-[#AAAAAA] uppercase tracking-[1px]">• {m.zone}</span>
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 uppercase tracking-wider ${
-                          m.maintenanceStatus === 'critical_overuse'
-                            ? 'bg-[#DC3545] text-white'
-                            : 'bg-[#FFC107] text-black font-black'
-                        }`}
-                      >
-                        {m.maintenanceStatus.replace('_', ' ')}
+                      <span className="font-display font-black text-sm uppercase tracking-wider text-white">
+                        {m.name}
+                      </span>
+                      <span className={`text-[10px] font-black px-2 py-0.5 uppercase tracking-wider border ${
+                        m.maintenanceStatus === 'critical_overuse'
+                          ? 'bg-[#DC3545]/20 text-[#DC3545] border-[#DC3545]'
+                          : 'bg-[#FFC107]/20 text-[#FFC107] border-[#FFC107]'
+                      }`}>
+                        {m.maintenanceStatus === 'critical_overuse' ? 'CRITICAL OVERUSE' : 'SERVICE DUE'}
                       </span>
                     </div>
 
-                    <p className="text-xs text-red-300 flex items-center gap-1.5 font-medium">
-                      <AlertTriangle className="w-3.5 h-3.5 text-[#DC3545] flex-shrink-0" />
+                    <p className="text-xs font-semibold text-[#FFC107] leading-relaxed">
                       {m.serviceNotes}
                     </p>
 
-                    <p className="text-[11px] text-[#777777] uppercase tracking-[1px] font-mono">
-                      Accumulated: <span className="text-white font-bold">{m.hoursSinceLastService}h</span> / Safe Limit: {m.serviceThresholdHours}h • Last Serviced: {m.lastServicedDate}
-                    </p>
+                    <div className="flex items-center gap-4 text-[11px] text-[#888888] font-mono">
+                      <span>OPERATING: <strong className="text-white">{m.hoursSinceLastService}h</strong> / {m.serviceThresholdHours}h LIMIT</span>
+                      <span>LAST SERVICED: <strong className="text-white">{m.lastServicedDate}</strong></span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="shrink-0">
                     <button
-                      onClick={() => setInspectingMachineId(m.id)}
-                      className="py-2 px-4 bg-[#97D700] hover:bg-[#86be00] text-black text-xs font-black uppercase tracking-[1px] flex items-center gap-1.5 shadow-[0_0_15px_rgba(151,215,0,0.3)] transition-all"
+                      onClick={() => setServicingMachine(m)}
+                      className="vg-btn vg-btn-3 text-xs px-4 py-2.5 tracking-wider w-full md:w-auto"
                     >
-                      <Wrench className="w-3.5 h-3.5" />
-                      <span>INSPECT & CLEAR</span>
+                      <Wrench className="w-3.5 h-3.5 mr-1" />
+                      LOG SERVICE & CLEAR
                     </button>
                   </div>
                 </div>
@@ -216,167 +159,125 @@ export const AnalyticsView: React.FC = () => {
         </div>
       )}
 
-      {/* 24-Hour Peak Facility Busyness Curve (Brutalist Histogram) */}
-      <div className="bg-black p-5 border-2 border-[#222222] space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#222222] pb-3">
+      {/* ================= SECTION 3: 24-HOUR BUSYNESS CURVE ================= */}
+      <div className="bg-black border-2 border-[#333333] p-6 space-y-5 shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-[#212529]">
           <div>
-            <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#97D700]" />
-              <h3 className="font-black text-sm uppercase tracking-[2px] text-white">
-                24-HOUR PEAK FACILITY BUSYNESS CURVE
-              </h3>
-            </div>
-            <p className="text-xs text-[#AAAAAA] uppercase tracking-[1px] mt-0.5">
-              Aggregated hourly occupancy percentage across all 22 gym machines
+            <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px] flex items-center gap-2">
+              <BarChart2 className="w-5 h-5 text-[#97D700]" />
+              24-HOUR PEAK TRAFFIC HISTOGRAM
+            </h3>
+            <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+              Aggregated live sensor load across cardio, strength, and turf zones
             </p>
           </div>
-          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[1px]">
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 bg-[#97D700]"></span> &lt;50% Optimal
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 bg-[#FFC107]"></span> 50-74% Moderate
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 bg-[#DC3545]"></span> 75%+ Rush
-            </span>
+          <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-wider">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#97D700]" /> LOW (&lt;50%)</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#9FC63B]" /> MODERATE</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-[#DC3545]" /> PEAK (&gt;75%)</span>
           </div>
         </div>
 
-        {/* Bar chart representation (06:00 to 23:00) */}
-        <div className="h-52 flex items-end gap-1.5 pt-8 pb-3 px-2 bg-[#080808] border border-[#222222] relative">
-          {hourlyAverages.slice(6, 24).map((avg, i) => {
-            const hour = i + 6;
-            const hourStr = `${hour.toString().padStart(2, '0')}:00`;
-            const isPeak = avg >= 75;
-            const isModerate = avg >= 50 && avg < 75;
+        {/* Bar chart representation */}
+        <div className="relative pt-8 pb-2">
+          {/* Active Hover Floating Readout */}
+          {hoveredHour && (
+            <div className="absolute top-0 right-2 px-3 py-1 bg-black border-2 border-[#97D700] text-xs font-black uppercase tracking-[2px] text-white">
+              {hoveredHour.hour.toString().padStart(2, '0')}:00 ➔ <span className="text-[#97D700]">{hoveredHour.avg}% OCCUPANCY</span>
+            </div>
+          )}
 
-            return (
-              <div
-                key={hour}
-                onMouseEnter={() => setHoveredHour({ hour, avg })}
-                onMouseLeave={() => setHoveredHour(null)}
-                className="flex-1 flex flex-col items-center h-full justify-end group relative cursor-pointer"
-              >
-                {/* Tooltip */}
-                <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-[#97D700] text-white text-[10px] font-mono px-2 py-1 shadow-lg pointer-events-none whitespace-nowrap z-20">
-                  <span className="text-[#97D700] font-bold">{hourStr}</span> • {avg}% Occupied
-                </div>
+          <div className="h-52 flex items-end gap-1 sm:gap-2 px-2 border-b-2 border-[#333333]">
+            {hourlyAverages.slice(6, 23).map((avg, i) => {
+              const hour = i + 6;
+              const isPeak = avg >= 75;
+              const isModerate = avg >= 50 && avg < 75;
 
-                {/* Vertical Bar */}
+              return (
                 <div
-                  className={`w-full transition-all duration-300 ${
-                    isPeak
-                      ? 'bg-[#DC3545] group-hover:brightness-125 shadow-[0_0_10px_rgba(220,53,69,0.5)]'
-                      : isModerate
-                      ? 'bg-[#FFC107] group-hover:brightness-125'
-                      : 'bg-[#97D700] group-hover:brightness-125 shadow-[0_0_8px_rgba(151,215,0,0.3)]'
-                  }`}
-                  style={{ height: `${Math.max(8, avg)}%` }}
-                />
-                <span className="text-[10px] text-[#777777] font-mono mt-2 group-hover:text-white transition-colors">
-                  {hour}h
-                </span>
-              </div>
-            );
-          })}
-        </div>
+                  key={hour}
+                  onMouseEnter={() => setHoveredHour({ hour, avg })}
+                  onMouseLeave={() => setHoveredHour(null)}
+                  className="flex-1 flex flex-col items-center h-full justify-end cursor-pointer group"
+                >
+                  {/* Bar */}
+                  <div
+                    className={`w-full transition-all duration-200 border-t-2 ${
+                      isPeak
+                        ? 'bg-[#DC3545] border-white group-hover:brightness-125'
+                        : isModerate
+                        ? 'bg-[#9FC63B] border-white group-hover:brightness-125'
+                        : 'bg-[#97D700] border-white group-hover:brightness-125'
+                    }`}
+                    style={{ height: `${Math.max(8, avg)}%` }}
+                  />
 
-        {/* Selected Hour Telemetry Callout */}
-        {hoveredHour && (
-          <div className="text-center text-xs font-mono text-[#AAAAAA] uppercase tracking-[1px] animate-fadeIn">
-            At {hoveredHour.hour.toString().padStart(2, '0')}:00 — Occupancy is{' '}
-            <span
-              className={`font-black ${
-                hoveredHour.avg >= 75
-                  ? 'text-[#DC3545]'
-                  : hoveredHour.avg >= 50
-                  ? 'text-[#FFC107]'
-                  : 'text-[#97D700]'
-              }`}
-            >
-              {hoveredHour.avg}% ({Math.round((hoveredHour.avg / 100) * machines.length)} of {machines.length} machines in use)
-            </span>
+                  {/* Hour Label */}
+                  <span className="text-[10px] text-[#777777] group-hover:text-white font-mono mt-2 truncate w-full text-center transition-colors">
+                    {hour}h
+                  </span>
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Equipment Utilization Leaderboard */}
-      <div className="bg-black p-5 border-2 border-[#222222] space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#222222] pb-3">
+      {/* ================= SECTION 4: EQUIPMENT UTILIZATION LEADERBOARD ================= */}
+      <div className="bg-black border-2 border-[#333333] p-6 space-y-5 shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-[#212529]">
           <div>
-            <h3 className="font-black text-sm uppercase tracking-[2px] text-white">
+            <h3 className="font-display font-black text-lg text-white uppercase tracking-[2px] flex items-center gap-2">
+              <Dumbbell className="w-5 h-5 text-[#97D700]" />
               EQUIPMENT UTILIZATION LEADERBOARD
             </h3>
-            <p className="text-xs text-[#AAAAAA] uppercase tracking-[1px] mt-0.5">
-              Ranked by daily operating cycle hours & capacity utilization
+            <p className="text-xs text-[#AAAAAA] uppercase tracking-wider">
+              Top stations ranked by cumulative daily operational hours
             </p>
           </div>
-          <span className="text-xs text-[#97D700] font-mono uppercase tracking-[1px] font-bold">
-            TOP 10 WORKHORSES
+          <span className="text-xs text-[#888888] font-mono uppercase tracking-widest">
+            RANKED 1 - 7
           </span>
         </div>
 
-        <div className="divide-y divide-[#222222] border border-[#222222] bg-[#0a0a0a]">
-          {mostUsed.slice(0, 10).map((m, idx) => (
+        <div className="space-y-2.5">
+          {mostUsed.slice(0, 7).map((m, idx) => (
             <div
               key={m.id}
-              className="p-3.5 flex items-center gap-3 text-xs hover:bg-[#111111] transition-colors"
+              className="p-3 bg-[#111111] border-2 border-[#222222] hover:border-[#333333] flex items-center gap-3 text-xs transition-colors"
             >
-              {/* Rank Badge */}
-              <span
-                className={`font-mono font-black w-6 text-center text-xs ${
-                  idx === 0
-                    ? 'text-[#97D700]'
-                    : idx === 1
-                    ? 'text-sky-400'
-                    : idx === 2
-                    ? 'text-amber-400'
-                    : 'text-[#555555]'
-                }`}
-              >
+              <span className="font-display font-black text-sm text-[#555555] w-6 text-center">
                 #{idx + 1}
               </span>
-
-              {/* Machine Code */}
-              <span className="font-mono font-black px-2 py-0.5 bg-black text-[#97D700] border border-[#333333] text-[11px]">
+              <span className="font-display font-black px-2 py-0.5 bg-black text-[#97D700] border border-[#333333] text-xs">
                 {m.code}
               </span>
-
-              {/* Category Icon */}
-              <span>{getCategoryIcon(m.category)}</span>
-
-              {/* Machine Name & Zone */}
               <div className="flex-1 min-w-0">
-                <span className="font-bold text-white uppercase tracking-[0.5px] truncate block">
-                  {m.name}
-                </span>
-                <span className="text-[10px] text-[#777777] uppercase tracking-[0.5px]">
-                  {m.zone}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="font-display font-bold uppercase tracking-wider text-white truncate">
+                    {m.name}
+                  </span>
+                  <span className="text-[#AAAAAA] font-mono text-[11px] ml-2 shrink-0">
+                    {m.avgDailyUsageHours}h/day
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full bg-black h-2.5 border border-[#333333] mt-1.5 overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ${
+                      m.utilizationPercentage >= 85
+                        ? 'bg-[#DC3545]'
+                        : m.utilizationPercentage >= 70
+                        ? 'bg-[#9FC63B]'
+                        : 'bg-[#97D700]'
+                    }`}
+                    style={{ width: `${m.utilizationPercentage}%` }}
+                  />
+                </div>
               </div>
 
-              {/* Daily Usage Hours */}
-              <span className="text-[#AAAAAA] font-mono hidden sm:inline text-xs">
-                {m.avgDailyUsageHours} hrs/day
-              </span>
-
-              {/* Meter Bar */}
-              <div className="w-28 sm:w-44 bg-[#111111] h-3 border border-[#333333] overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-500 ${
-                    m.utilizationPercentage >= 85
-                      ? 'bg-[#DC3545]'
-                      : m.utilizationPercentage >= 70
-                      ? 'bg-[#FFC107]'
-                      : 'bg-[#97D700]'
-                  }`}
-                  style={{ width: `${m.utilizationPercentage}%` }}
-                />
-              </div>
-
-              {/* Utilization Percentage */}
-              <span className="font-mono font-black text-white w-12 text-right">
+              <span className="font-display font-black text-sm text-white w-12 text-right">
                 {m.utilizationPercentage}%
               </span>
             </div>
@@ -384,12 +285,13 @@ export const AnalyticsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Staff Inspection Modal */}
-      <ServiceModal
-        machineId={inspectingMachineId}
-        isOpen={inspectingMachineId !== null}
-        onClose={() => setInspectingMachineId(null)}
-      />
+      {/* Staff Maintenance Inspection Modal */}
+      {servicingMachine && (
+        <ServiceModal
+          machine={servicingMachine}
+          onClose={() => setServicingMachine(null)}
+        />
+      )}
     </div>
   );
 };

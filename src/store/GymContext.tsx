@@ -157,7 +157,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Staff Maintenance: Reset service hours & mark healthy
-  const logService = (id: string, notes?: string, technician = 'Staff On Duty') => {
+  const logService = (id: string, notes?: string, technician: string = 'Staff On Duty') => {
     const today = new Date().toISOString().split('T')[0];
     setMachines(prev =>
       prev.map(m => {
