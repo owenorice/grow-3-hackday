@@ -11,7 +11,7 @@ const AppContent: React.FC = () => {
   const { activeTab } = useGym();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-[#97D700] selection:text-black">
       {/* Top Header with Guest / Staff Mode Switch & Live Gauges */}
       <Header />
 
@@ -28,9 +28,11 @@ const AppContent: React.FC = () => {
       {/* Floating Demo Simulator Controls */}
       <SimulatorDrawer />
 
-      {/* Bottom Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-4 text-center text-xs text-slate-600">
-        <p>Apex Hotel & Leisure Club • Gym Floorplan & Overuse Telemetry System • 90-Min Hackday Edition</p>
+      {/* Bottom Brutalist Footer */}
+      <footer className="border-t-2 border-[#212529] bg-black py-5 text-center text-xs text-[#777777] uppercase tracking-[2px]">
+        <p>
+          <span className="text-white font-black">VILLAGE GYM</span> • HEALTH & WELLNESS CLUB • REAL-TIME FLOOR & MAINTENANCE TELEMETRY
+        </p>
       </footer>
     </div>
   );

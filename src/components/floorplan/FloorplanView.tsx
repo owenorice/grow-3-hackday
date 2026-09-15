@@ -51,23 +51,23 @@ export const FloorplanView: React.FC = () => {
   };
 
   const getMachineFill = (m: GymMachine) => {
-    if (m.status === 'maintenance') return '#475569'; // slate-600
+    if (m.status === 'maintenance') return '#333333'; // neutral-800
 
     if (isStaff) {
-      if (m.maintenanceStatus === 'critical_overuse') return '#b91c1c'; // red-700
-      if (m.maintenanceStatus === 'service_due') return '#b45309'; // amber-700
-      return '#0f766e'; // teal-700
+      if (m.maintenanceStatus === 'critical_overuse') return '#DC3545'; // Danger
+      if (m.maintenanceStatus === 'service_due') return '#FFC107'; // Warning
+      return '#198754'; // Success green
     }
 
-    if (m.status === 'in_use') return '#ef4444'; // red-500
-    return '#10b981'; // emerald-500
+    if (m.status === 'in_use') return '#DC3545'; // Danger
+    return '#97D700'; // Volt Lime (Village Gym brand accent)
   };
 
   const getMachineStroke = (m: GymMachine) => {
-    if (m.id === selectedMachineId) return '#38bdf8'; // sky-400 highlight
-    if (isStaff && m.maintenanceStatus === 'critical_overuse') return '#fca5a5';
-    if (isStaff && m.maintenanceStatus === 'service_due') return '#fcd34d';
-    return '#334155'; // slate-700
+    if (m.id === selectedMachineId) return '#FFFFFF'; // White high-contrast selection
+    if (isStaff && m.maintenanceStatus === 'critical_overuse') return '#DC3545';
+    if (isStaff && m.maintenanceStatus === 'service_due') return '#FFC107';
+    return '#212529'; // Dark charcoal border
   };
 
   const handleZoom = (delta: number) => {
@@ -558,22 +558,22 @@ export const FloorplanView: React.FC = () => {
           </div>
         )}
 
-        {/* Selected Machine Detail Card Floating in Floorplan */}
+        {/* Selected Machine Detail Card Floating in Floorplan - Village Gym Pod */}
         {selectedMachine && (
-          <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-2xl shadow-2xl z-30 animate-in fade-in slide-in-from-bottom-2">
+          <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-black border-2 border-[#97D700] p-4 shadow-[0_0_30px_rgba(151,215,0,0.25)] z-30 animate-in fade-in slide-in-from-bottom-2">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-200 font-mono text-xs font-bold border border-slate-700">
+                  <span className="px-2 py-0.5 bg-[#212529] text-[#97D700] font-mono text-xs font-bold border border-[#333333]">
                     {selectedMachine.code}
                   </span>
-                  <span className="font-bold text-sm text-white">{selectedMachine.name}</span>
+                  <span className="font-black text-sm uppercase tracking-wider text-white">{selectedMachine.name}</span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">{selectedMachine.zone}</p>
+                <p className="text-xs text-[#AAAAAA] uppercase tracking-wider font-semibold mt-0.5">{selectedMachine.zone}</p>
               </div>
               <button
                 onClick={() => selectMachine(null)}
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-[#AAAAAA] hover:text-white p-1 hover:bg-[#212529] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -582,28 +582,28 @@ export const FloorplanView: React.FC = () => {
             {/* Guest view details */}
             {!isStaff ? (
               <div className="mt-3 space-y-2.5 text-xs">
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50">
-                  <span className="text-slate-400">Current Status:</span>
+                <div className="flex items-center justify-between p-2.5 bg-[#111111] border border-[#333333]">
+                  <span className="text-[#AAAAAA] uppercase font-bold tracking-wider text-[10px]">Current Status:</span>
                   <span
-                    className={`font-semibold flex items-center gap-1.5 ${
+                    className={`font-black uppercase tracking-wider flex items-center gap-1.5 ${
                       selectedMachine.status === 'available'
-                        ? 'text-emerald-400'
+                        ? 'text-[#97D700]'
                         : selectedMachine.status === 'in_use'
-                        ? 'text-red-400'
-                        : 'text-slate-400'
+                        ? 'text-[#DC3545]'
+                        : 'text-[#AAAAAA]'
                     }`}
                   >
                     {selectedMachine.status === 'available' ? (
                       <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Free & Ready to Workout
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#97D700]" /> FREE & READY
                       </>
                     ) : selectedMachine.status === 'in_use' ? (
                       <>
-                        <Clock className="w-3.5 h-3.5 text-red-400" /> In Use ({selectedMachine.currentSessionMinutes}m elapsed)
+                        <Clock className="w-3.5 h-3.5 text-[#DC3545]" /> OCCUPIED ({selectedMachine.currentSessionMinutes}m)
                       </>
                     ) : (
                       <>
-                        <Wrench className="w-3.5 h-3.5 text-slate-400" /> Out of Service
+                        <Wrench className="w-3.5 h-3.5 text-[#777777]" /> UNDER SERVICE
                       </>
                     )}
                   </span>
@@ -611,54 +611,52 @@ export const FloorplanView: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2 text-slate-400 p-1">
                   <div>
-                    <span className="block text-[10px] text-slate-500 uppercase font-semibold">Peak Times</span>
-                    <span className="text-slate-200 font-medium text-[11px] truncate block">{selectedMachine.peakHours}</span>
+                    <span className="block text-[10px] text-[#777777] uppercase font-bold tracking-wider">Peak Times</span>
+                    <span className="text-white font-medium text-[11px] truncate block">{selectedMachine.peakHours}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-slate-500 uppercase font-semibold">Estimated Wait</span>
-                    <span className="text-slate-200 font-medium text-[11px]">
-                      {selectedMachine.status === 'available' ? 'None (Free)' : `~${selectedMachine.estimatedWaitMinutes} mins`}
+                    <span className="block text-[10px] text-[#777777] uppercase font-bold tracking-wider">Estimated Wait</span>
+                    <span className="text-[#97D700] font-bold text-[11px]">
+                      {selectedMachine.status === 'available' ? '0 MINS (FREE)' : `~${selectedMachine.estimatedWaitMinutes} MINS`}
                     </span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => toggleMachineStatus(selectedMachine.id)}
-                  className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg ${
-                    selectedMachine.status === 'available'
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
-                      : 'bg-red-600/90 hover:bg-red-500 text-white shadow-red-950/50'
+                  className={`w-full vg-btn ${
+                    selectedMachine.status === 'available' ? 'vg-btn-3' : 'vg-btn-danger'
                   }`}
                 >
-                  {selectedMachine.status === 'available' ? "I'm using this machine" : "Done / Free Up Machine"}
+                  {selectedMachine.status === 'available' ? "CLAIM THIS STATION" : "RELEASE STATION"}
                 </button>
               </div>
             ) : (
               /* Staff View Telemetry & Service Actions */
               <div className="mt-3 space-y-2.5 text-xs">
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-2">
+                <div className="p-3 bg-[#111111] border border-[#333333] space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Hours Since Last Service:</span>
-                    <span className={`font-mono font-bold ${
+                    <span className="text-[#AAAAAA] uppercase font-bold tracking-wider text-[10px]">Hours Since Last Service:</span>
+                    <span className={`font-mono font-black ${
                       selectedMachine.maintenanceStatus === 'critical_overuse'
-                        ? 'text-red-400'
+                        ? 'text-[#DC3545]'
                         : selectedMachine.maintenanceStatus === 'service_due'
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
+                        ? 'text-[#FFC107]'
+                        : 'text-[#97D700]'
                     }`}>
                       {selectedMachine.hoursSinceLastService}h / {selectedMachine.serviceThresholdHours}h Limit
                     </span>
                   </div>
 
                   {/* Overuse Progress Bar */}
-                  <div className="w-full bg-slate-700/80 h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#212529] h-2.5 overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${
                         selectedMachine.maintenanceStatus === 'critical_overuse'
-                          ? 'bg-red-500'
+                          ? 'bg-[#DC3545]'
                           : selectedMachine.maintenanceStatus === 'service_due'
-                          ? 'bg-amber-500'
-                          : 'bg-emerald-500'
+                          ? 'bg-[#FFC107]'
+                          : 'bg-[#97D700]'
                       }`}
                       style={{
                         width: `${Math.min(100, (selectedMachine.hoursSinceLastService / selectedMachine.serviceThresholdHours) * 100)}%`,
@@ -666,15 +664,15 @@ export const FloorplanView: React.FC = () => {
                     />
                   </div>
 
-                  <div className="flex justify-between text-[11px] text-slate-400 pt-0.5">
-                    <span>Total Lifetime: {selectedMachine.totalLifetimeHours}h</span>
+                  <div className="flex justify-between text-[11px] text-[#777777] pt-0.5 uppercase tracking-wider font-semibold">
+                    <span>Lifetime: {selectedMachine.totalLifetimeHours}h</span>
                     <span>Last Serviced: {selectedMachine.lastServicedDate}</span>
                   </div>
                 </div>
 
                 {selectedMachine.serviceNotes && (
-                  <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-300 text-[11px] flex gap-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="p-2.5 bg-[#212529] border-l-4 border-[#FFC107] text-[#FFC107] text-[11px] flex gap-2">
+                    <AlertTriangle className="w-4 h-4 text-[#FFC107] flex-shrink-0 mt-0.5" />
                     <span>{selectedMachine.serviceNotes}</span>
                   </div>
                 )}
@@ -682,15 +680,15 @@ export const FloorplanView: React.FC = () => {
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={() => logService(selectedMachine.id)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-amber-950/40"
+                    className="flex-1 vg-btn vg-btn-3"
                   >
-                    <Wrench className="w-3.5 h-3.5" /> Log Service & Reset
+                    <Wrench className="w-3.5 h-3.5" /> LOG SERVICE
                   </button>
                   <button
                     onClick={() => toggleMaintenance(selectedMachine.id)}
-                    className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 font-medium"
+                    className="vg-btn vg-btn-1"
                   >
-                    {selectedMachine.status === 'maintenance' ? 'Reopen' : 'Flag Out'}
+                    {selectedMachine.status === 'maintenance' ? 'RESTORE' : 'FLAG OUT'}
                   </button>
                 </div>
               </div>

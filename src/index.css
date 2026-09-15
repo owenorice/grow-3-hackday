@@ -3,10 +3,142 @@
 @tailwind utilities;
 
 :root {
+  /* Village Gym Brand Tokens */
+  --color-brand-primary: #97D700;
+  --color-brand-primary-rgb: 151, 215, 0;
+  --color-brand-logo: #9FC63B;
+
+  /* Surfaces */
+  --color-surface-pitch: #000000;
+  --color-surface-dark: #212529;
+  --color-surface-charcoal: #333333;
+  --color-surface-stone: #F1F1EC;
+  --color-surface-light: #F8F9FA;
+  --color-surface-white: #FFFFFF;
+
+  /* Text Colors */
+  --color-text-on-dark: #FFFFFF;
+  --color-text-on-light: #000000;
+  --color-text-muted: #6C757D;
+  --color-text-disabled: #777777;
+
+  /* Borders & Dividers */
+  --color-border-dark: #333333;
+  --color-border-light: #DEE2E6;
+  --color-border-stone: #F1F1EC;
+  --color-border-accent: #97D700;
+  --color-border-translucent-white: rgba(255, 255, 255, 0.2);
+
+  /* Status */
+  --color-success: #198754;
+  --color-warning: #FFC107;
+  --color-danger: #DC3545;
+  --color-danger-text: #721C24;
+  --color-info: #0D6EFD;
+
+  /* Overlays & Shadows */
+  --overlay-banner: rgba(0, 0, 0, 0.6);
+  --overlay-modal: rgba(0, 0, 0, 0.8);
+  --shadow-vignette: inset 0 0 100px 0 rgba(0, 0, 0, 0.5);
+  --shadow-vignette-hover: inset 0 0 50px 0 rgba(0, 0, 0, 0.5);
+
   color-scheme: dark;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Village Gym Button System (.btn) */
+.vg-btn {
+  border-radius: 0;
+  border-width: 2px;
+  border-style: solid;
+  min-height: 44px;
+  padding: 8px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* .btn-1 (Dark Neutral) */
+.vg-btn-1 {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-color: #333333;
+}
+.vg-btn-1:hover {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+/* .btn-2 (Accent Outline Dark) */
+.vg-btn-2 {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-color: #97D700;
+}
+.vg-btn-2:hover {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+/* .btn-3 (Primary Volt Lime CTA) */
+.vg-btn-3 {
+  background-color: #97D700;
+  color: #000000;
+  border-color: #97D700;
+}
+.vg-btn-3:hover {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+/* .btn-4 (Inverted Accent) */
+.vg-btn-4 {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #97D700;
+}
+.vg-btn-4:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+/* .btn-danger */
+.vg-btn-danger {
+  background-color: #DC3545;
+  color: #FFFFFF;
+  border-color: #DC3545;
+}
+.vg-btn-danger:hover {
+  background-color: #FFFFFF;
+  color: #DC3545;
+  border-color: #DC3545;
+}
+
+/* Pod link with Volt Lime underline */
+.vg-link {
+  letter-spacing: 2px;
+  border-bottom: 2px solid #97D700;
+  text-transform: uppercase;
+  display: inline-block;
+  padding-bottom: 2px;
+  font-weight: 700;
 }
