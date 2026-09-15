@@ -5,6 +5,7 @@ import { Tabs } from './components/layout/Tabs';
 import { FloorplanView } from './components/floorplan/FloorplanView';
 import { EquipmentListView } from './components/equipment/EquipmentListView';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
+import { WorkoutCircuitDrawer } from './components/circuit/WorkoutCircuitDrawer';
 import { SimulatorDrawer } from './components/simulator/SimulatorDrawer';
 
 const AppContent: React.FC = () => {
@@ -19,11 +20,14 @@ const AppContent: React.FC = () => {
       <Tabs />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 pb-24">
         {activeTab === 'floorplan' && <FloorplanView />}
         {activeTab === 'list' && <EquipmentListView />}
         {activeTab === 'analytics' && <AnalyticsView />}
       </main>
+
+      {/* Member Linear Workout Circuit Queue Bar & Drawer */}
+      <WorkoutCircuitDrawer />
 
       {/* Floating Demo Simulator Controls */}
       <SimulatorDrawer />

@@ -39,6 +39,9 @@ interface GymContextType {
   removeFromCircuit: (machineId: string) => void;
   advanceCircuit: () => void;
   clearCircuit: () => void;
+  moveCircuitStation: (fromIndex: number, toIndex: number) => void;
+  updateStationTiming: (machineId: string, plannedMinutes: number, restTransitionMinutes: number) => void;
+  setCircuitStep: (stepIndex: number) => void;
 
   // Presenter Simulator Actions
   simulatePeakRush: () => void;
@@ -318,6 +321,54 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   };
 
+  const moveCircuitStation = (fromIndex: number, toIndex: number) => {
+    setCircuit(prev => {
+      if (fromIndex < 0 || fromIndex >= prev.stations.length) return prev;
+      if (toIndex < 0 || toIndex >= prev.stations.length) return prev;
+      const updated = [...prev.stations];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return {
+        ...prev,
+        stations: updated.map((s, idx) => ({ ...s, order: idx + 1 })),
+      };
+    });
+  };
+
+  const updateStationTiming = (machineId: string, plannedMinutes: number, restTransitionMinutes: number) => {
+    setCircuit(prev => ({
+      ...prev,
+      stations: prev.stations.map(s =>
+        s.machineId === machineId
+          ? {
+              ...s,
+              plannedMinutes: Math.max(1, plannedMinutes),
+              restTransitionMinutes: Math.max(0, restTransitionMinutes),
+            }
+          : s
+      ),
+    }));
+  };
+
+  const setCircuitStep = (stepIndex: number) => {
+    setCircuit(prev => {
+      if (stepIndex < 0 || stepIndex >= prev.stations.length) return prev;
+      const targetStation = prev.stations[stepIndex];
+      setMachines(current =>
+        current.map(m => {
+          if (m.id === targetStation.machineId) {
+            return { ...m, status: 'in_use', currentSessionMinutes: 1 };
+          }
+          return m;
+        })
+      );
+      return {
+        ...prev,
+        currentStepIndex: stepIndex,
+      };
+    });
+  };
+
   return (
     <GymContext.Provider
       value={{
@@ -348,6 +399,9 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         removeFromCircuit,
         advanceCircuit,
         clearCircuit,
+        moveCircuitStation,
+        updateStationTiming,
+        setCircuitStep,
 
         simulatePeakRush,
         simulateEmptyGym,
