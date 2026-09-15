@@ -11,6 +11,7 @@ import {
   ZoomOut,
   RotateCcw,
 } from 'lucide-react';
+import { ServiceModal } from '../staff/ServiceModal';
 
 export const FloorplanView: React.FC = () => {
   const {
@@ -20,9 +21,10 @@ export const FloorplanView: React.FC = () => {
     selectedMachine,
     appMode,
     toggleMachineStatus,
-    logService,
     toggleMaintenance,
   } = useGym();
+
+  const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
 
   const isStaff = appMode === 'staff';
 
@@ -714,10 +716,10 @@ export const FloorplanView: React.FC = () => {
 
                 <div className="flex gap-2 pt-1">
                   <button
-                    onClick={() => logService(selectedMachine.id)}
+                    onClick={() => setServicingMachine(selectedMachine)}
                     className="flex-1 vg-btn vg-btn-3"
                   >
-                    <Wrench className="w-3.5 h-3.5" /> LOG SERVICE
+                    <Wrench className="w-3.5 h-3.5 mr-1" /> INSPECT & CLEAR
                   </button>
                   <button
                     onClick={() => toggleMaintenance(selectedMachine.id)}
@@ -731,6 +733,14 @@ export const FloorplanView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Staff Maintenance Inspection Modal */}
+      {servicingMachine && (
+        <ServiceModal
+          machine={servicingMachine}
+          onClose={() => setServicingMachine(null)}
+        />
+      )}
     </div>
   );
 };
