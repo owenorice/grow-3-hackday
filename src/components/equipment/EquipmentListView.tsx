@@ -41,6 +41,9 @@ export const EquipmentListView: React.FC = () => {
     toggleMachineStatus,
     logService,
     toggleMaintenance,
+    circuit,
+    addToCircuit,
+    removeFromCircuit,
   } = useGym();
 
   const isStaff = appMode === 'staff';
@@ -444,6 +447,7 @@ export const EquipmentListView: React.FC = () => {
         {sortedMachines.map(m => {
           const isSelected = m.id === selectedMachineId;
           const isRecentlyServiced = m.id === recentlyServicedId;
+          const isInCircuit = circuit.stations.some(s => s.machineId === m.id);
           const serviceRatio = Math.min(100, Math.round((m.hoursSinceLastService / m.serviceThresholdHours) * 100));
 
           return (
@@ -641,6 +645,25 @@ export const EquipmentListView: React.FC = () => {
                           Done / Free Machine
                         </>
                       )}
+                    </button>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (isInCircuit) {
+                          removeFromCircuit(m.id);
+                        } else {
+                          addToCircuit(m.id);
+                        }
+                      }}
+                      className={`p-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1 ${
+                        isInCircuit
+                          ? 'bg-[#97D700] border-[#97D700] text-black font-bold shadow-[0_0_10px_rgba(151,215,0,0.3)]'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700/80'
+                      }`}
+                      title={isInCircuit ? 'Remove from Workout Circuit' : 'Add to Workout Circuit Queue'}
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">{isInCircuit ? 'In Circuit' : '+ Circuit'}</span>
                     </button>
                     <button
                       onClick={e => handleViewOnMap(e, m)}
