@@ -1,6 +1,6 @@
 import { GymMachine } from '../types/gym';
 
-export const SEED_MACHINES: GymMachine[] = [
+const RAW_MACHINES: GymMachine[] = [
   // --- ZONE 1: Cardio Deck (Top Left: x 40..340, y 40..260) ---
   {
     id: 'm-tm-01',
@@ -481,3 +481,148 @@ export const SEED_MACHINES: GymMachine[] = [
     coordinates: { x: 50, y: 420, width: 260, height: 80 },
   },
 ];
+
+const getMachineMeta = (code: string) => {
+  if (code.startsWith('TM-')) {
+    return {
+      targetMuscleGroup: 'Cardiovascular & Aerobic Stamina',
+      equivalentMachineCodes: ['TM-01', 'TM-02', 'TM-03', 'TM-04', 'EL-01'],
+      procurementCost: 5200,
+      annualMaintenanceCost: 650,
+      depreciationYears: 5,
+    };
+  }
+  if (code === 'SM-01' || code === 'SM-02') {
+    return {
+      targetMuscleGroup: 'Glutes, Calves & Aerobic Power',
+      equivalentMachineCodes: ['SM-01', 'SM-02', 'TM-01', 'EL-01'],
+      procurementCost: 6800,
+      annualMaintenanceCost: 800,
+      depreciationYears: 5,
+    };
+  }
+  if (code.startsWith('EL-')) {
+    return {
+      targetMuscleGroup: 'Low-Impact Cardio & Full Body',
+      equivalentMachineCodes: ['EL-01', 'RW-01', 'TM-01'],
+      procurementCost: 4400,
+      annualMaintenanceCost: 450,
+      depreciationYears: 6,
+    };
+  }
+  if (code.startsWith('RW-')) {
+    return {
+      targetMuscleGroup: 'Full Body Endurance & Lat Ergometer',
+      equivalentMachineCodes: ['RW-01', 'EL-01', 'TF-01'],
+      procurementCost: 1650,
+      annualMaintenanceCost: 200,
+      depreciationYears: 7,
+    };
+  }
+  if (code.startsWith('SQ-')) {
+    return {
+      targetMuscleGroup: 'Quadriceps, Glutes & Posterior Chain',
+      equivalentMachineCodes: ['SQ-01', 'SQ-02', 'SQ-03', 'LP-01', 'SM-03'],
+      procurementCost: 7400,
+      annualMaintenanceCost: 450,
+      depreciationYears: 8,
+    };
+  }
+  if (code === 'SM-03') {
+    return {
+      targetMuscleGroup: 'Guided Multi-Angle Compound Strength',
+      equivalentMachineCodes: ['SM-03', 'SQ-01', 'BP-01'],
+      procurementCost: 5800,
+      annualMaintenanceCost: 550,
+      depreciationYears: 7,
+    };
+  }
+  if (code.startsWith('BP-')) {
+    return {
+      targetMuscleGroup: 'Pectorals, Anterior Delts & Triceps',
+      equivalentMachineCodes: ['BP-01', 'BP-02', 'IB-01', 'DB-01'],
+      procurementCost: 3800,
+      annualMaintenanceCost: 300,
+      depreciationYears: 8,
+    };
+  }
+  if (code.startsWith('IB-')) {
+    return {
+      targetMuscleGroup: 'Upper Clavicular Pectorals & Delts',
+      equivalentMachineCodes: ['IB-01', 'BP-01', 'DB-01'],
+      procurementCost: 3600,
+      annualMaintenanceCost: 300,
+      depreciationYears: 8,
+    };
+  }
+  if (code.startsWith('CC-')) {
+    return {
+      targetMuscleGroup: 'Chest, Arms & Rotational Core Isolation',
+      equivalentMachineCodes: ['CC-01', 'CC-02', 'LP-02', 'DB-01'],
+      procurementCost: 8200,
+      annualMaintenanceCost: 850,
+      depreciationYears: 6,
+    };
+  }
+  if (code === 'LP-01') {
+    return {
+      targetMuscleGroup: 'Plate-Loaded Quad & Leg Drive',
+      equivalentMachineCodes: ['LP-01', 'SQ-01', 'LC-01'],
+      procurementCost: 6900,
+      annualMaintenanceCost: 500,
+      depreciationYears: 8,
+    };
+  }
+  if (code === 'LP-02') {
+    return {
+      targetMuscleGroup: 'Latissimus Dorsi & Upper Back Cable',
+      equivalentMachineCodes: ['LP-02', 'CC-01', 'RW-01'],
+      procurementCost: 4600,
+      annualMaintenanceCost: 450,
+      depreciationYears: 7,
+    };
+  }
+  if (code.startsWith('LC-')) {
+    return {
+      targetMuscleGroup: 'Hamstring & Quadricep Knee Flexion',
+      equivalentMachineCodes: ['LC-01', 'LP-01', 'SQ-01'],
+      procurementCost: 4200,
+      annualMaintenanceCost: 400,
+      depreciationYears: 7,
+    };
+  }
+  if (code.startsWith('DB-')) {
+    return {
+      targetMuscleGroup: 'Multi-Planar Free Weight Strength',
+      equivalentMachineCodes: ['DB-01', 'DB-02', 'BP-01', 'IB-01'],
+      procurementCost: 6500,
+      annualMaintenanceCost: 350,
+      depreciationYears: 10,
+    };
+  }
+  if (code.startsWith('TF-')) {
+    return {
+      targetMuscleGroup: 'Hyrox Functional Sled, Sprint & Core',
+      equivalentMachineCodes: ['TF-01', 'RW-01', 'DB-02'],
+      procurementCost: 3200,
+      annualMaintenanceCost: 250,
+      depreciationYears: 5,
+    };
+  }
+  return {
+    targetMuscleGroup: 'Full Body Conditioning',
+    equivalentMachineCodes: [],
+    procurementCost: 4000,
+    annualMaintenanceCost: 400,
+    depreciationYears: 6,
+  };
+};
+
+export const SEED_MACHINES: GymMachine[] = RAW_MACHINES.map(m => {
+  const meta = getMachineMeta(m.code);
+  return {
+    ...m,
+    ...meta,
+  };
+});
+

@@ -34,6 +34,15 @@ export interface GymMachine {
   utilizationPercentage: number; // 0 - 100%
   hourlyUsage: number[]; // 24-element array for 24 hours of the day (0-100% busy)
 
+  // Biomechanical & Smart Circuit Telemetry
+  targetMuscleGroup?: string; // e.g. "Legs & Quads", "Chest & Triceps", "Back & Lats", "Cardiovascular"
+  equivalentMachineCodes?: string[]; // e.g. ["LP-01", "HS-01"] for Squat Rack
+
+  // Financial Capex & Asset Telemetry
+  procurementCost?: number; // e.g. 7400 (£)
+  annualMaintenanceCost?: number; // e.g. 850 (£)
+  depreciationYears?: number; // e.g. 5
+
   // 2D SVG Canvas Position (on 1000x600 viewBox)
   coordinates: {
     x: number;

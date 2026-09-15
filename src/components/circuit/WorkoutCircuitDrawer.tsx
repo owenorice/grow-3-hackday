@@ -18,6 +18,7 @@ import {
   Layers,
   Sparkles,
   RotateCcw,
+  Zap,
 } from 'lucide-react';
 import { EquipmentCategory } from '../../types/gym';
 
@@ -31,12 +32,15 @@ export const WorkoutCircuitDrawer: React.FC = () => {
     moveCircuitStation,
     updateStationTiming,
     setCircuitStep,
+    optimizeCircuitRoute,
+    swapCircuitMachine,
     selectMachine,
     setActiveTab,
     appMode,
   } = useGym();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // If in staff mode, hide member workout circuit or keep minimal
   const isStaff = appMode === 'staff';
@@ -58,6 +62,57 @@ export const WorkoutCircuitDrawer: React.FC = () => {
       };
     });
   }, [circuit, machines]);
+
+  // Congested upcoming stations where equipment is currently occupied
+  const upcomingCongested = useMemo(() => {
+    return stationsWithData.filter(s => s.isUpcoming && s.machine && s.machine.status === 'in_use');
+  }, [stationsWithData]);
+
+  const totalUpcomingWaitMinutes = useMemo(() => {
+    return upcomingCongested.reduce((sum, s) => sum + (s.machine?.estimatedWaitMinutes || 8), 0);
+  }, [upcomingCongested]);
+
+  // Find equivalent machine recommendations for any congested stations
+  const alternativeRecommendations = useMemo(() => {
+    return upcomingCongested
+      .map(station => {
+        const busyMachine = station.machine!;
+        // Find machines with matching codes or same target muscle group that are AVAILABLE
+        const candidates = machines.filter(m => {
+          if (m.id === busyMachine.id || m.status !== 'available') return false;
+          const matchesEquivalentCode = busyMachine.equivalentMachineCodes?.includes(m.code);
+          const matchesTargetMuscle =
+            busyMachine.targetMuscleGroup &&
+            m.targetMuscleGroup &&
+            busyMachine.targetMuscleGroup === m.targetMuscleGroup;
+          const matchesCategory = m.category === busyMachine.category;
+          return matchesEquivalentCode || matchesTargetMuscle || matchesCategory;
+        });
+
+        return {
+          congestedStation: station,
+          busyMachine,
+          bestAlternative: candidates[0] || null,
+        };
+      })
+      .filter(r => r.bestAlternative !== null);
+  }, [upcomingCongested, machines]);
+
+  const handleAutoOptimize = () => {
+    const { reordered, savedMinutes } = optimizeCircuitRoute();
+    if (reordered) {
+      setToastMessage(`⚡ Smart route re-ordered! Saved ${savedMinutes} minutes in upcoming wait time.`);
+    } else {
+      setToastMessage('✅ Stations already sequenced for optimal turnover!');
+    }
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleSwapAlternative = (busyId: string, altId: string, altName: string) => {
+    swapCircuitMachine(busyId, altId);
+    setToastMessage(`🔄 Replaced with ${altName}! Station is available immediately (0m wait).`);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   const currentStationData = stationsWithData[circuit.currentStepIndex] || null;
 
@@ -239,6 +294,101 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                 <span className="text-base font-black text-white font-mono">~{totalCircuitMinutes}m</span>
               </div>
             </div>
+
+            {/* Action Toast Banner */}
+            {toastMessage && (
+              <div className="bg-[#97D700] text-black font-oswald font-black text-xs px-4 py-2 flex items-center justify-between tracking-wider uppercase animate-in fade-in duration-200">
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  {toastMessage}
+                </span>
+                <button onClick={() => setToastMessage(null)} className="p-0.5 hover:bg-black/10">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* AI Smart Circuit Optimization & Zero-Wait Pod */}
+            {circuit.stations.length > 1 && (
+              <div className="bg-[#0b0e10] border-b-2 border-[#1f2429] p-3 sm:p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-7 h-7 bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff] flex items-center justify-center shrink-0 mt-0.5">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-oswald font-black text-xs uppercase tracking-[1.5px] text-white">
+                          AI CIRCUIT OPTIMIZER // ZERO-WAIT ROUTING
+                        </span>
+                        {totalUpcomingWaitMinutes > 0 ? (
+                          <span className="bg-rose-950/80 text-rose-300 border border-rose-800 text-[10px] font-mono px-2 py-0.5 font-bold">
+                            +{totalUpcomingWaitMinutes}M QUEUE DELAY
+                          </span>
+                        ) : (
+                          <span className="bg-emerald-950/80 text-emerald-300 border border-emerald-800 text-[10px] font-mono px-2 py-0.5 font-bold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" /> 0M WAIT PREDICTED
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#8c959e] mt-0.5">
+                        {totalUpcomingWaitMinutes > 0
+                          ? `Upcoming stations are occupied. Re-order sequence or swap with idle biomechanical equivalents to eliminate delay.`
+                          : `All upcoming circuit stations are currently open or will turnover in time for your arrival.`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {totalUpcomingWaitMinutes > 0 && (
+                    <button
+                      onClick={handleAutoOptimize}
+                      className="bg-[#00e5ff] hover:bg-[#00c4db] text-black font-oswald font-black text-xs py-2 px-3.5 tracking-wider uppercase flex items-center gap-1.5 shrink-0 transition-colors shadow-[0_0_15px_rgba(0,229,255,0.3)]"
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-black" />
+                      AUTO-OPTIMIZE SEQUENCE
+                    </button>
+                  )}
+                </div>
+
+                {/* Biomechanical Alternatives List */}
+                {alternativeRecommendations.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[#8c959e] tracking-wider block">
+                      Recommended 0-Wait Machine Swaps:
+                    </span>
+                    {alternativeRecommendations.map(({ busyMachine, bestAlternative }) => (
+                      <div
+                        key={busyMachine.id}
+                        className="bg-[#101417] border border-[#262c33] hover:border-[#00e5ff] p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-colors"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="text-rose-400 font-mono font-bold line-through">
+                            {busyMachine.name}
+                          </span>
+                          <span className="text-[10px] text-rose-400 font-mono">
+                            (+{busyMachine.estimatedWaitMinutes || 8}m wait)
+                          </span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#00e5ff] shrink-0" />
+                          <span className="text-white font-bold font-oswald tracking-wide">
+                            {bestAlternative.name}
+                          </span>
+                          <span className="bg-[#122415] text-[#97D700] border border-[#97D700]/40 text-[9px] font-mono px-1.5 py-0.5">
+                            0m WAIT • SAME TARGET: {busyMachine.targetMuscleGroup || 'TARGET MUSCLE'}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => handleSwapAlternative(busyMachine.id, bestAlternative.id, bestAlternative.name)}
+                          className="bg-[#181d22] hover:bg-[#00e5ff] hover:text-black border border-[#00e5ff] text-[#00e5ff] font-oswald font-black text-[11px] py-1 px-3 tracking-wider uppercase transition-colors shrink-0"
+                        >
+                          SWAP NOW (0m WAIT)
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Stations Queue List */}
             <div className="p-4 overflow-y-auto max-h-[50vh] space-y-3 divide-y divide-[#222222]/50">

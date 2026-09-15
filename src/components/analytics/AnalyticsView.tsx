@@ -16,8 +16,12 @@ import {
   ArrowUpDown,
   Flame,
   CheckCircle2,
+  FileSpreadsheet,
+  PoundSterling,
+  Download,
 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
+import { CapexReportModal } from './CapexReportModal';
 
 type SortOption = 'utilization' | 'hours' | 'urgency' | 'code';
 type TelemetryFilter = 'overdue_only' | 'critical_only' | 'all';
@@ -38,6 +42,66 @@ export const AnalyticsView: React.FC = () => {
   const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
   const [selectedChartZone, setSelectedChartZone] = useState<GymZone | 'all'>('all');
   const [telemetryFilter, setTelemetryFilter] = useState<TelemetryFilter>('overdue_only');
+  const [isCapexModalOpen, setIsCapexModalOpen] = useState<boolean>(false);
+
+  const handleExportCsv = () => {
+    const headers = [
+      'Machine ID',
+      'Code',
+      'Name',
+      'Category',
+      'Zone',
+      'Status',
+      'Utilization Rate (%)',
+      'Avg Daily Hours',
+      'Total Lifetime Hours',
+      'Hours Since Service',
+      'Service Threshold',
+      'Maintenance Status',
+      'Last Serviced Date',
+      'Target Muscle Group',
+      'Procurement Cost (GBP)',
+      'Annual Maintenance (GBP)',
+      'Strategic Capex Recommendation',
+    ];
+
+    const rows = machines.map(m => {
+      let rec = 'Maintain Fleet Standard';
+      if (m.utilizationPercentage >= 85) rec = 'High Urgency: Procure Additional Units';
+      else if (m.utilizationPercentage <= 35) rec = 'Low Urgency: Reallocate Footprint Space';
+      else if (m.maintenanceStatus === 'critical_overuse') rec = 'Critical: Immediate Maintenance Overhaul';
+
+      return [
+        `"${m.id}"`,
+        `"${m.code}"`,
+        `"${m.name.replace(/"/g, '""')}"`,
+        `"${m.category}"`,
+        `"${m.zone}"`,
+        `"${m.status}"`,
+        m.utilizationPercentage,
+        m.avgDailyUsageHours,
+        m.totalLifetimeHours,
+        m.hoursSinceLastService,
+        m.serviceThresholdHours,
+        `"${m.maintenanceStatus}"`,
+        `"${m.lastServicedDate}"`,
+        `"${m.targetMuscleGroup || 'General Conditioning'}"`,
+        m.procurementCost || 5000,
+        m.annualMaintenanceCost || 500,
+        `"${rec}"`,
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `village_gym_fleet_capex_audit_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Leaderboard filters
   const [leaderboardSearch, setLeaderboardSearch] = useState<string>('');
@@ -201,6 +265,49 @@ export const AnalyticsView: React.FC = () => {
           <p className="text-xs text-[#AAAAAA] mt-2 font-normal leading-relaxed">
             Safety threshold status across all 4 club zones.
           </p>
+        </div>
+      </div>
+
+      {/* ================= SECTION 1.5: EXECUTIVE CAPEX & FLEET ROI POD ================= */}
+      <div className="bg-[#101316] border-2 border-[#2b3036] hover:border-[#97D700] p-5 relative transition-all shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#97D700]" />
+        <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#97D700]" />
+        
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-[#97D700] text-black text-[10px] font-black font-oswald px-2 py-0.5 tracking-wider uppercase">
+                EXECUTIVE INTELLIGENCE
+              </span>
+              <span className="text-xs font-mono text-[#8c959e] uppercase">
+                FINANCIAL CAPEX &amp; FLEET UTILIZATION ENGINE
+              </span>
+            </div>
+            <h3 className="text-xl font-oswald font-black uppercase text-white tracking-wide flex items-center gap-2">
+              <PoundSterling className="w-5 h-5 text-[#97D700]" />
+              EQUIPMENT FLEET AUDIT &amp; PROCUREMENT BUSINESS CASES
+            </h3>
+            <p className="text-xs text-[#a0aab4] max-w-2xl leading-relaxed">
+              Export data-driven CapEx recommendations for club CFOs and finance directors. Identify high-demand bottlenecks (e.g. Olympic Power Racks at 96% load) to justify new asset purchasing and optimize floor space.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => setIsCapexModalOpen(true)}
+              className="bg-[#97D700] hover:bg-[#85c000] text-black font-oswald font-black text-xs py-2.5 px-4 tracking-wider uppercase flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(151,215,0,0.3)]"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              VIEW EXECUTIVE BOARD REPORT
+            </button>
+            <button
+              onClick={handleExportCsv}
+              className="bg-[#14171a] border-2 border-[#97D700] hover:bg-[#97D700] hover:text-black text-[#97D700] font-oswald font-black text-xs py-2.5 px-4 tracking-wider uppercase flex items-center gap-2 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              DOWNLOAD CSV TELEMETRY
+            </button>
+          </div>
         </div>
       </div>
 
@@ -700,6 +807,13 @@ export const AnalyticsView: React.FC = () => {
           onClose={() => setServicingMachine(null)}
         />
       )}
+
+      {/* Executive Capex & Asset Telemetry Report Modal */}
+      <CapexReportModal
+        isOpen={isCapexModalOpen}
+        onClose={() => setIsCapexModalOpen(false)}
+        onExportCsv={handleExportCsv}
+      />
     </div>
   );
 };

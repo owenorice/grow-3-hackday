@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGym } from '../../store/GymContext';
-import { ShieldCheck, AlertTriangle, Sparkles, Dumbbell } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Sparkles, Dumbbell, Presentation } from 'lucide-react';
+import { RoadmapSlideshowModal } from '../roadmap/RoadmapSlideshowModal';
 
 export const Header: React.FC = () => {
   const { appMode, setAppMode, stats } = useGym();
+  const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
 
   const isStaff = appMode === 'staff';
 
@@ -54,32 +56,51 @@ export const Header: React.FC = () => {
           )}
         </div>
 
-        {/* Right: Guest / Staff Mode Toggle Switch */}
-        <div className="flex items-center bg-black border-2 border-[#333333] p-0.5">
+        {/* Right Actions: Pitch Deck & Mode Switch */}
+        <div className="flex items-center gap-2">
+          {/* Pitch Deck / Future Roadmap Trigger */}
           <button
-            onClick={() => setAppMode('guest')}
-            className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
-              !isStaff
-                ? 'bg-[#97D700] text-black shadow-sm'
-                : 'text-[#AAAAAA] hover:text-white'
-            }`}
+            onClick={() => setIsRoadmapModalOpen(true)}
+            className="bg-[#14171a] border-2 border-[#97D700] hover:bg-[#97D700] hover:text-black text-[#97D700] px-3 py-1.5 text-xs font-oswald font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-[0_0_12px_rgba(151,215,0,0.25)]"
+            title="Open Future Roadmap Executive Presentation Deck"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            Guest View
+            <Presentation className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">PITCH DECK</span>
           </button>
-          <button
-            onClick={() => setAppMode('staff')}
-            className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
-              isStaff
-                ? 'bg-[#DC3545] text-white shadow-sm'
-                : 'text-[#AAAAAA] hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Staff Portal
-          </button>
+
+          {/* Guest / Staff Mode Toggle Switch */}
+          <div className="flex items-center bg-black border-2 border-[#333333] p-0.5">
+            <button
+              onClick={() => setAppMode('guest')}
+              className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
+                !isStaff
+                  ? 'bg-[#97D700] text-black shadow-sm'
+                  : 'text-[#AAAAAA] hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Guest View
+            </button>
+            <button
+              onClick={() => setAppMode('staff')}
+              className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${
+                isStaff
+                  ? 'bg-[#DC3545] text-white shadow-sm'
+                  : 'text-[#AAAAAA] hover:text-white'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Staff Portal
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Presentation Slideshow Modal */}
+      <RoadmapSlideshowModal
+        isOpen={isRoadmapModalOpen}
+        onClose={() => setIsRoadmapModalOpen(false)}
+      />
     </header>
   );
 };

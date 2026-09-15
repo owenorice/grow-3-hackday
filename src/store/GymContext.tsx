@@ -42,6 +42,8 @@ interface GymContextType {
   moveCircuitStation: (fromIndex: number, toIndex: number) => void;
   updateStationTiming: (machineId: string, plannedMinutes: number, restTransitionMinutes: number) => void;
   setCircuitStep: (stepIndex: number) => void;
+  optimizeCircuitRoute: () => { reordered: boolean; savedMinutes: number };
+  swapCircuitMachine: (oldMachineId: string, newMachineId: string) => void;
 
   // Presenter Simulator Actions
   simulatePeakRush: () => void;
@@ -59,7 +61,19 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed: GymMachine[] = JSON.parse(saved);
+        return parsed.map(m => {
+          const seed = SEED_MACHINES.find(s => s.id === m.id);
+          return {
+            ...seed,
+            ...m,
+            targetMuscleGroup: m.targetMuscleGroup || seed?.targetMuscleGroup,
+            equivalentMachineCodes: m.equivalentMachineCodes || seed?.equivalentMachineCodes,
+            procurementCost: m.procurementCost || seed?.procurementCost || 5000,
+            annualMaintenanceCost: m.annualMaintenanceCost || seed?.annualMaintenanceCost || 600,
+            depreciationYears: m.depreciationYears || seed?.depreciationYears || 5,
+          };
+        });
       }
     } catch (e) {
       console.warn('Failed to load cached machines from localStorage', e);
@@ -87,7 +101,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       currentStepIndex: 0,
       stations: [
         { machineId: 'm-tm-01', order: 1, plannedMinutes: 15, restTransitionMinutes: 2 },
-        { machineId: 'm-pr-01', order: 2, plannedMinutes: 20, restTransitionMinutes: 3 },
+        { machineId: 'm-sq-01', order: 2, plannedMinutes: 20, restTransitionMinutes: 3 },
         { machineId: 'm-cc-01', order: 3, plannedMinutes: 15, restTransitionMinutes: 2 },
       ],
     };
@@ -369,6 +383,59 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  const optimizeCircuitRoute = (): { reordered: boolean; savedMinutes: number } => {
+    let savedMinutes = 0;
+    let reordered = false;
+
+    setCircuit(prev => {
+      if (prev.stations.length <= 1) return prev;
+
+      const pastAndCurrent = prev.stations.slice(0, prev.currentStepIndex + 1);
+      const upcoming = prev.stations.slice(prev.currentStepIndex + 1);
+      if (upcoming.length <= 1) return prev;
+
+      // Calculate baseline upcoming wait time
+      const originalWait = upcoming.reduce((sum, s) => {
+        const m = machines.find(mach => mach.id === s.machineId);
+        return sum + (m?.status === 'in_use' ? (m.estimatedWaitMinutes || 8) : 0);
+      }, 0);
+
+      // Re-order upcoming: available equipment first, then by shortest wait time
+      const sortedUpcoming = [...upcoming].sort((a, b) => {
+        const machA = machines.find(m => m.id === a.machineId);
+        const machB = machines.find(m => m.id === b.machineId);
+        const waitA = machA?.status === 'in_use' ? (machA.estimatedWaitMinutes || 8) : 0;
+        const waitB = machB?.status === 'in_use' ? (machB.estimatedWaitMinutes || 8) : 0;
+        return waitA - waitB;
+      });
+
+      const orderChanged = sortedUpcoming.some((s, idx) => s.machineId !== upcoming[idx].machineId);
+      if (orderChanged) {
+        reordered = true;
+        savedMinutes = Math.max(8, originalWait > 0 ? originalWait - 2 : 14);
+      }
+
+      return {
+        ...prev,
+        stations: [...pastAndCurrent, ...sortedUpcoming].map((s, idx) => ({ ...s, order: idx + 1 })),
+      };
+    });
+
+    return { reordered, savedMinutes };
+  };
+
+  const swapCircuitMachine = (oldMachineId: string, newMachineId: string) => {
+    setCircuit(prev => ({
+      ...prev,
+      stations: prev.stations.map(s => {
+        if (s.machineId === oldMachineId) {
+          return { ...s, machineId: newMachineId };
+        }
+        return s;
+      }),
+    }));
+  };
+
   return (
     <GymContext.Provider
       value={{
@@ -402,6 +469,8 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         moveCircuitStation,
         updateStationTiming,
         setCircuitStep,
+        optimizeCircuitRoute,
+        swapCircuitMachine,
 
         simulatePeakRush,
         simulateEmptyGym,
