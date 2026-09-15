@@ -18,8 +18,10 @@ import {
   Layers,
   Sparkles,
   RotateCcw,
+  Info,
 } from 'lucide-react';
 import { EquipmentCategory } from '../../types/gym';
+import { useToast } from '../../context/ToastContext';
 
 export const WorkoutCircuitDrawer: React.FC = () => {
   const {
@@ -36,6 +38,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
     appMode,
   } = useGym();
 
+  const { showToast } = useToast();
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   // If in staff mode, hide member workout circuit or keep minimal
@@ -84,6 +87,32 @@ export const WorkoutCircuitDrawer: React.FC = () => {
       default:
         return <Sparkles className="w-3.5 h-3.5 text-[#97D700]" />;
     }
+  };
+
+  const handleAdvanceCircuit = () => {
+    if (circuit.currentStepIndex < circuit.stations.length - 1) {
+      advanceCircuit();
+      const nextIndex = circuit.currentStepIndex + 1;
+      const nextStation = stationsWithData[nextIndex];
+      showToast(
+        `Advanced to Step ${nextIndex + 1}: ${nextStation?.machine ? `${nextStation.machine.code} (${nextStation.machine.name})` : 'Next Station'}`,
+        'success'
+      );
+    } else {
+      advanceCircuit();
+      showToast('🏆 Full workout circuit completed! Excellent work.', 'success');
+    }
+  };
+
+  const handleRemove = (machineId: string, code?: string) => {
+    removeFromCircuit(machineId);
+    showToast(`Removed ${code ? `station ${code}` : 'station'} from workout circuit`, 'info');
+  };
+
+  const handleClear = () => {
+    clearCircuit();
+    showToast('Workout circuit queue cleared', 'info');
+    setIsExpanded(false);
   };
 
   const handleViewOnMap = (e: React.MouseEvent, machineId: string) => {
@@ -166,7 +195,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
             {/* Advance to Next Station Button */}
             {circuit.stations.length > 0 && (
               <button
-                onClick={advanceCircuit}
+                onClick={handleAdvanceCircuit}
                 className="bg-[#97D700] hover:bg-[#86be00] text-black font-black px-3.5 py-1.5 text-xs uppercase tracking-[1px] flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(151,215,0,0.3)] active:translate-y-0.5"
                 title="Mark current station complete and advance to next machine"
               >
@@ -240,6 +269,17 @@ export const WorkoutCircuitDrawer: React.FC = () => {
               </div>
             </div>
 
+            {/* Educational Callout: 2-Minute Buffer Explained */}
+            <div className="bg-[#111111] border-b border-[#222222] p-3 px-4 text-xs text-slate-300 flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-[#97D700] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-white uppercase tracking-wider text-[11px]">Why 2 Mins Rest & Transition Buffer?</span>
+                <p className="text-[#888888] mt-0.5 text-[11px] leading-relaxed">
+                  Every station automatically accounts for cleaning down the station after your workout and walking to the next zone. You can fine-tune this buffer per machine using the - and + controls below.
+                </p>
+              </div>
+            </div>
+
             {/* Stations Queue List */}
             <div className="p-4 overflow-y-auto max-h-[50vh] space-y-3 divide-y divide-[#222222]/50">
               {stationsWithData.length === 0 ? (
@@ -285,7 +325,10 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                           </div>
 
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-[#222222] text-[#97D700] border border-[#333333]">
+                                STEP {idx + 1} OF {stationsWithData.length}
+                              </span>
                               <span className="font-mono text-xs font-bold text-[#97D700]">{m.code}</span>
                               <h4 className="font-bold text-xs uppercase tracking-[0.5px] text-white">{m.name}</h4>
                               <span className="p-0.5">{getCategoryIcon(m.category)}</span>
@@ -412,7 +455,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                               </button>
                             )}
                             <button
-                              onClick={() => removeFromCircuit(s.machineId)}
+                              onClick={() => handleRemove(s.machineId, m.code)}
                               className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 border border-red-800"
                               title="Remove station from circuit"
                             >
@@ -431,7 +474,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
             <div className="bg-[#111111] border-t-2 border-[#222222] p-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={clearCircuit}
+                  onClick={handleClear}
                   disabled={circuit.stations.length === 0}
                   className="px-3 py-2 bg-[#222222] hover:bg-[#333333] disabled:opacity-40 text-xs font-bold uppercase tracking-[1px] text-[#AAAAAA] hover:text-white border border-[#444444] flex items-center gap-1.5 transition-colors"
                 >
@@ -449,7 +492,7 @@ export const WorkoutCircuitDrawer: React.FC = () => {
                 </button>
                 {circuit.stations.length > 0 && (
                   <button
-                    onClick={advanceCircuit}
+                    onClick={handleAdvanceCircuit}
                     className="px-4 py-2 bg-[#97D700] hover:bg-[#86be00] text-black text-xs font-black uppercase tracking-[1px] flex items-center gap-1.5 shadow-[0_0_20px_rgba(151,215,0,0.4)] transition-all"
                   >
                     <span>NEXT STATION</span>

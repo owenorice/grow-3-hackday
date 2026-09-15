@@ -10,8 +10,11 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  Plus,
+  Check,
 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
+import { useToast } from '../../context/ToastContext';
 
 export const FloorplanView: React.FC = () => {
   const {
@@ -22,16 +25,22 @@ export const FloorplanView: React.FC = () => {
     appMode,
     toggleMachineStatus,
     toggleMaintenance,
+    circuit,
+    addToCircuit,
+    removeFromCircuit,
   } = useGym();
 
+  const { showToast } = useToast();
   const [servicingMachine, setServicingMachine] = useState<GymMachine | null>(null);
 
   const isStaff = appMode === 'staff';
 
-  // Zoom & Viewport states
+  // Zoom, viewport, guide & status filter states
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [activeZoneFilter, setActiveZoneFilter] = useState<GymZone | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'in_use' | 'maintenance'>('all');
   const [hoveredMachineId, setHoveredMachineId] = useState<string | null>(null);
+  const [showHintBanner, setShowHintBanner] = useState<boolean>(true);
 
   // Zone Coordinates for viewport focusing
   const zoneViewBoxes: Record<GymZone | 'all', { x: number; y: number; w: number; h: number }> = {
@@ -83,13 +92,63 @@ export const FloorplanView: React.FC = () => {
 
   const hoveredMachine = machines.find(m => m.id === hoveredMachineId);
 
+  // Dynamic status counts
+  const availableCount = machines.filter(m => m.status === 'available').length;
+  const inUseCount = machines.filter(m => m.status === 'in_use').length;
+  const maintenanceCount = machines.filter(
+    m => m.status === 'maintenance' || m.maintenanceStatus === 'critical_overuse' || m.maintenanceStatus === 'service_due'
+  ).length;
+
+  const handleToggleClaim = (m: GymMachine) => {
+    toggleMachineStatus(m.id);
+    if (m.status === 'available') {
+      showToast(`Station ${m.code} (${m.name}) claimed!`, 'success');
+    } else {
+      showToast(`Station ${m.code} released to available.`, 'info');
+    }
+  };
+
+  const handleToggleCircuit = (m: GymMachine) => {
+    const isInCircuit = circuit.stations.some(s => s.machineId === m.id);
+    if (isInCircuit) {
+      removeFromCircuit(m.id);
+      showToast(`Removed ${m.code} from workout circuit`, 'info');
+    } else {
+      addToCircuit(m.id);
+      showToast(`Added ${m.code} (${m.name}) to workout circuit`, 'success');
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {/* Top Controls: Zone Jump Filters & Status Legend */}
-      <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+      {/* First-Time User Guidance Banner */}
+      {showHintBanner && (
+        <div className="bg-[#111111] border-2 border-[#97D700]/70 p-3.5 flex items-center justify-between gap-3 text-xs text-white relative shadow-[0_0_20px_rgba(151,215,0,0.15)] animate-in fade-in duration-200">
+          <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-[#97D700]" />
+          <div className="flex items-center gap-2.5">
+            <span className="w-6 h-6 flex items-center justify-center bg-[#97D700] text-black font-black text-[10px] tracking-wider shrink-0">
+              TIP
+            </span>
+            <p className="text-slate-200">
+              <strong className="text-white uppercase tracking-wider font-bold">Floorplan Navigation:</strong> Tap any station on the floorplan to inspect live wait times, load specifications, or reserve it in your linear workout circuit.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowHintBanner(false)}
+            className="text-[#777777] hover:text-white transition-colors p-1 shrink-0"
+            title="Dismiss hint"
+            aria-label="Dismiss hint"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Top Controls: Zone Focus & Interactive Status Legend */}
+      <div className="bg-black p-3 sm:p-4 border-2 border-[#222222] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
         {/* Zone Selector Buttons */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-          <span className="font-semibold text-slate-400 uppercase tracking-wider text-[11px] mr-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <span className="font-bold text-[#777777] uppercase tracking-wider text-[11px] mr-1 shrink-0">
             Focus:
           </span>
           <button
@@ -97,10 +156,10 @@ export const FloorplanView: React.FC = () => {
               setActiveZoneFilter('all');
               setZoomLevel(1);
             }}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+            className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all border ${
               activeZoneFilter === 'all'
-                ? isStaff ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+                ? isStaff ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-[#97D700] text-black border-[#97D700]'
+                : 'bg-[#111111] text-slate-300 border-[#333333] hover:border-slate-500'
             }`}
           >
             All Zones
@@ -114,54 +173,92 @@ export const FloorplanView: React.FC = () => {
                   setActiveZoneFilter(zone);
                   setZoomLevel(1.2);
                 }}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap border ${
                   activeZoneFilter === zone
-                    ? isStaff ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'
-                    : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+                    ? isStaff ? 'bg-[#FFC107] text-black border-[#FFC107]' : 'bg-[#97D700] text-black border-[#97D700]'
+                    : 'bg-[#111111] text-slate-300 border-[#333333] hover:border-slate-500'
                 }`}
               >
                 <span>{zone}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  stats.available > 0 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-red-950 text-red-300'
+                <span className={`text-[10px] px-1.5 py-0.2 font-mono ${
+                  stats.available > 0 ? 'bg-black text-[#97D700] border border-[#97D700]/50' : 'bg-[#DC3545]/20 text-[#DC3545] border border-[#DC3545]/40'
                 }`}>
-                  {stats.available}/{stats.total} free
+                  {stats.available}/{stats.total}
                 </span>
               </button>
             );
           })}
         </div>
 
-        {/* Legend Indicators */}
-        <div className="flex items-center gap-3 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800/80">
-          {!isStaff ? (
-            <>
-              <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                Available
+        {/* Interactive Floating Status Legend */}
+        <div className="flex items-center justify-between gap-2 bg-[#111111] px-3 py-2 border border-[#333333]">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#777777] hidden sm:inline">
+              Legend:
+            </span>
+
+            {/* Volt Lime: Available */}
+            <button
+              onClick={() => setStatusFilter(prev => prev === 'available' ? 'all' : 'available')}
+              className={`flex items-center gap-1.5 px-2 py-1 text-xs font-bold tracking-wider uppercase border transition-all ${
+                statusFilter === 'available'
+                  ? 'bg-[#97D700] text-black border-[#97D700]'
+                  : 'bg-black text-slate-200 border-[#333333] hover:border-[#97D700]'
+              }`}
+              title="Filter available stations"
+            >
+              <span className="w-2.5 h-2.5 bg-[#97D700] inline-block shrink-0 shadow-[0_0_8px_#97D700]" />
+              <span>Available</span>
+              <span className="ml-1 text-[10px] font-mono opacity-80">({availableCount})</span>
+            </button>
+
+            {/* Danger Red: In Use */}
+            <button
+              onClick={() => setStatusFilter(prev => prev === 'in_use' ? 'all' : 'in_use')}
+              className={`flex items-center gap-1.5 px-2 py-1 text-xs font-bold tracking-wider uppercase border transition-all ${
+                statusFilter === 'in_use'
+                  ? 'bg-[#DC3545] text-white border-[#DC3545]'
+                  : 'bg-black text-slate-200 border-[#333333] hover:border-[#DC3545]'
+              }`}
+              title="Filter stations currently in use"
+            >
+              <span className="w-2.5 h-2.5 bg-[#DC3545] inline-block shrink-0 shadow-[0_0_8px_#DC3545]" />
+              <span>In Use</span>
+              <span className="ml-1 text-[10px] font-mono opacity-80">({inUseCount})</span>
+            </button>
+
+            {/* Amber: Service Due / Overuse */}
+            <button
+              onClick={() => setStatusFilter(prev => prev === 'maintenance' ? 'all' : 'maintenance')}
+              className={`flex items-center gap-1.5 px-2 py-1 text-xs font-bold tracking-wider uppercase border transition-all ${
+                statusFilter === 'maintenance'
+                  ? 'bg-[#FFC107] text-black border-[#FFC107]'
+                  : 'bg-black text-slate-200 border-[#333333] hover:border-[#FFC107]'
+              }`}
+              title="Filter maintenance or alert stations"
+            >
+              <span className="w-2.5 h-2.5 bg-[#FFC107] inline-block shrink-0 shadow-[0_0_8px_#FFC107]" />
+              <span>{isStaff ? 'Service Alert' : 'Service'}</span>
+              <span className="ml-1 text-[10px] font-mono opacity-80">({maintenanceCount})</span>
+            </button>
+
+            {/* White Glow: Selected Station Indicator */}
+            <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-black text-slate-300 border border-white/60">
+              <span className="w-2 h-2 border border-white bg-white/40 shadow-[0_0_8px_white]" />
+              <span className="text-[11px] font-mono">
+                {selectedMachine ? `Selected: ${selectedMachine.code}` : 'Selected: None'}
               </span>
-              <span className="flex items-center gap-1.5 text-red-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span> In Use
-              </span>
-              <span className="flex items-center gap-1.5 text-slate-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-slate-600"></span> Maintenance
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="flex items-center gap-1.5 text-teal-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-teal-500"></span> Healthy
-              </span>
-              <span className="flex items-center gap-1.5 text-amber-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span> Service Due
-              </span>
-              <span className="flex items-center gap-1.5 text-red-400 font-medium animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span> Overuse Alert
-              </span>
-            </>
-          )}
+            </div>
+
+            {statusFilter !== 'all' && (
+              <button
+                onClick={() => setStatusFilter('all')}
+                className="text-[10px] uppercase font-bold text-[#777777] hover:text-white underline ml-1"
+              >
+                Reset
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -420,24 +517,34 @@ export const FloorplanView: React.FC = () => {
               const isServiceDue = isStaff && m.maintenanceStatus === 'service_due';
               const isAvailable = m.status === 'available';
 
+              const isFilteredOut =
+                statusFilter === 'available'
+                  ? m.status !== 'available'
+                  : statusFilter === 'in_use'
+                  ? m.status !== 'in_use'
+                  : statusFilter === 'maintenance'
+                  ? !(m.status === 'maintenance' || m.maintenanceStatus === 'critical_overuse' || m.maintenanceStatus === 'service_due')
+                  : false;
+
               return (
                 <g
                   key={m.id}
                   onClick={() => selectMachine(isSelected ? null : m.id)}
                   onMouseEnter={() => setHoveredMachineId(m.id)}
                   onMouseLeave={() => setHoveredMachineId(null)}
+                  opacity={isFilteredOut ? 0.22 : 1}
                   className="cursor-pointer transition-all duration-200"
                 >
                   {/* Subtle Radar Pulse for Available Machines in Guest Mode */}
-                  {!isStaff && isAvailable && (
+                  {!isStaff && isAvailable && !isFilteredOut && (
                     <circle
                       cx={m.coordinates.x + m.coordinates.width / 2}
                       cy={m.coordinates.y + m.coordinates.height / 2}
                       r={Math.max(m.coordinates.width, m.coordinates.height) / 1.7}
                       fill="none"
-                      stroke="#10b981"
-                      strokeWidth="1"
-                      strokeOpacity="0.4"
+                      stroke="#97D700"
+                      strokeWidth="1.2"
+                      strokeOpacity="0.5"
                       className="animate-ping"
                       style={{ animationDuration: '4s' }}
                     />
@@ -659,14 +766,36 @@ export const FloorplanView: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => toggleMachineStatus(selectedMachine.id)}
-                  className={`w-full vg-btn ${
-                    selectedMachine.status === 'available' ? 'vg-btn-3' : 'vg-btn-danger'
-                  }`}
-                >
-                  {selectedMachine.status === 'available' ? "CLAIM THIS STATION" : "RELEASE STATION"}
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                  <button
+                    onClick={() => handleToggleClaim(selectedMachine)}
+                    className={`flex-1 vg-btn ${
+                      selectedMachine.status === 'available' ? 'vg-btn-3' : 'vg-btn-danger'
+                    }`}
+                  >
+                    {selectedMachine.status === 'available' ? 'CLAIM STATION' : 'RELEASE STATION'}
+                  </button>
+                  <button
+                    onClick={() => handleToggleCircuit(selectedMachine)}
+                    className={`px-3 py-2 text-xs font-bold uppercase tracking-wider border-2 transition-all flex items-center justify-center gap-1.5 ${
+                      circuit.stations.some(s => s.machineId === selectedMachine.id)
+                        ? 'bg-[#97D700] text-black border-[#97D700]'
+                        : 'bg-black text-[#97D700] border-[#97D700] hover:bg-[#97D700]/10'
+                    }`}
+                  >
+                    {circuit.stations.some(s => s.machineId === selectedMachine.id) ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        IN CIRCUIT
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" />
+                        + CIRCUIT
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             ) : (
               /* Staff View Telemetry & Service Actions */

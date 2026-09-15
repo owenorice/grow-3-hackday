@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Wrench,
-  ChevronRight,
   X,
   RotateCcw,
   MapPin,
@@ -23,10 +22,12 @@ import {
   Check,
 } from 'lucide-react';
 import { ServiceModal } from '../staff/ServiceModal';
+import { useToast } from '../../context/ToastContext';
 
 type SortOption = 'code' | 'name' | 'availability' | 'utilization' | 'service_urgency';
 
 export const EquipmentListView: React.FC = () => {
+  const { showToast } = useToast();
   const {
     machines,
     filterCategory,
@@ -238,7 +239,7 @@ export const EquipmentListView: React.FC = () => {
               />
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                Show Available Only
+                Show Available Only ({totalStats.available})
               </span>
             </label>
 
@@ -407,22 +408,33 @@ export const EquipmentListView: React.FC = () => {
 
       {/* Empty State */}
       {sortedMachines.length === 0 && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-12 text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-slate-400">
-            <SlidersHorizontal className="w-7 h-7" />
+        <div className="bg-[#111111] border-2 border-[#222222] p-12 text-center space-y-5 relative shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+          {/* Tactical Corner Accents */}
+          <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#97D700]" />
+          <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#97D700]" />
+
+          <div className="w-16 h-16 bg-black border-2 border-[#333333] flex items-center justify-center mx-auto text-[#97D700] shadow-[0_0_15px_rgba(151,215,0,0.15)]">
+            <SlidersHorizontal className="w-8 h-8" />
           </div>
-          <div className="max-w-md mx-auto space-y-1">
-            <h3 className="text-base font-semibold text-white">No equipment matches your criteria</h3>
-            <p className="text-xs text-slate-400">
-              Try adjusting your search terms, changing the category, or turning off the availability toggle.
+          <div className="max-w-md mx-auto space-y-2">
+            <h3 className="text-lg font-black uppercase tracking-wider text-white">No Equipment Matches Criteria</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {searchQuery ? (
+                <>No stations found matching query <span className="text-[#97D700] font-mono font-bold">&quot;{searchQuery}&quot;</span>. Try broadening your keywords or clearing active filters.</>
+              ) : (
+                <>No equipment currently satisfies the selected category, zone, or availability criteria.</>
+              )}
             </p>
           </div>
           <button
-            onClick={handleResetFilters}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition-all"
+            onClick={() => {
+              handleResetFilters();
+              showToast('All equipment filters reset', 'info');
+            }}
+            className="vg-btn vg-btn-3 inline-flex items-center gap-2"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Clear All Filters
+            CLEAR ALL FILTERS
           </button>
         </div>
       )}
@@ -607,14 +619,19 @@ export const EquipmentListView: React.FC = () => {
                       onClick={e => {
                         e.stopPropagation();
                         toggleMachineStatus(m.id);
+                        if (m.status === 'available') {
+                          showToast(`Claimed ${m.code} (${m.name})!`, 'success');
+                        } else {
+                          showToast(`Station ${m.code} released to available.`, 'info');
+                        }
                       }}
                       disabled={m.status === 'maintenance'}
-                      className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 ${
+                      className={`flex-1 py-2 px-3 text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 uppercase tracking-wider ${
                         m.status === 'maintenance'
-                          ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                          ? 'bg-[#222222] text-[#666666] cursor-not-allowed border border-[#333333]'
                           : m.status === 'available'
-                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/40'
-                          : 'bg-rose-600/80 hover:bg-rose-600 text-white shadow-rose-950/40'
+                          ? 'bg-[#97D700] hover:bg-[#85be00] text-black font-black'
+                          : 'bg-[#DC3545] hover:bg-[#b02a37] text-white'
                       }`}
                     >
                       {m.status === 'maintenance' ? (
@@ -622,12 +639,12 @@ export const EquipmentListView: React.FC = () => {
                       ) : m.status === 'available' ? (
                         <>
                           <Sparkles className="w-3.5 h-3.5" />
-                          I&apos;m using this
+                          Quick Claim
                         </>
                       ) : (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          Done / Free Machine
+                          Release
                         </>
                       )}
                     </button>
@@ -636,14 +653,16 @@ export const EquipmentListView: React.FC = () => {
                         e.stopPropagation();
                         if (isInCircuit) {
                           removeFromCircuit(m.id);
+                          showToast(`Removed ${m.code} from workout circuit`, 'info');
                         } else {
                           addToCircuit(m.id);
+                          showToast(`Added ${m.code} (${m.name}) to circuit queue`, 'success');
                         }
                       }}
-                      className={`p-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1 ${
+                      className={`p-2 px-2.5 text-xs font-bold uppercase tracking-wider border transition-all flex items-center gap-1 ${
                         isInCircuit
-                          ? 'bg-[#97D700] border-[#97D700] text-black font-bold shadow-[0_0_10px_rgba(151,215,0,0.3)]'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700/80'
+                          ? 'bg-[#97D700] border-[#97D700] text-black shadow-[0_0_10px_rgba(151,215,0,0.3)]'
+                          : 'bg-[#111111] hover:bg-[#222222] text-slate-300 hover:text-white border-[#333333]'
                       }`}
                       title={isInCircuit ? 'Remove from Workout Circuit' : 'Add to Workout Circuit Queue'}
                     >
@@ -652,12 +671,11 @@ export const EquipmentListView: React.FC = () => {
                     </button>
                     <button
                       onClick={e => handleViewOnMap(e, m)}
-                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-colors flex items-center gap-1 text-xs font-semibold"
-                      title="View machine on 2D floorplan"
+                      className="p-2 px-2.5 bg-[#111111] hover:bg-[#222222] text-slate-300 hover:text-white border border-[#333333] transition-colors flex items-center gap-1 text-xs font-bold uppercase tracking-wider"
+                      title="Locate station on floorplan"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                      <MapPin className="w-3.5 h-3.5 text-[#97D700]" />
                       <span className="hidden sm:inline">Map</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                     </button>
                   </>
                 ) : (
@@ -665,7 +683,7 @@ export const EquipmentListView: React.FC = () => {
                   <>
                     <button
                       onClick={e => handleOpenLogModal(e, m)}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-950/40 flex items-center justify-center gap-1.5 transition-all"
+                      className="flex-1 py-2 px-3 text-xs font-bold uppercase tracking-wider bg-[#FFC107] hover:bg-[#e0a800] text-black shadow-md flex items-center justify-center gap-1.5 transition-all"
                     >
                       <Wrench className="w-3.5 h-3.5" />
                       Log Service
@@ -674,11 +692,16 @@ export const EquipmentListView: React.FC = () => {
                       onClick={e => {
                         e.stopPropagation();
                         toggleMaintenance(m.id);
+                        if (m.status === 'maintenance') {
+                          showToast(`Cleared maintenance lock on ${m.code}`, 'success');
+                        } else {
+                          showToast(`Flagged ${m.code} as Out of Order`, 'warning');
+                        }
                       }}
-                      className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1 ${
+                      className={`py-2 px-3 text-xs font-bold uppercase tracking-wider border transition-all flex items-center gap-1 ${
                         m.status === 'maintenance'
-                          ? 'bg-emerald-950/60 border-emerald-700 text-emerald-300 hover:bg-emerald-900/60'
-                          : 'bg-slate-800/90 border-slate-700 text-slate-300 hover:border-slate-600 hover:text-white'
+                          ? 'bg-[#97D700]/20 border-[#97D700] text-[#97D700] hover:bg-[#97D700]/30'
+                          : 'bg-[#111111] border-[#333333] text-slate-300 hover:border-slate-500 hover:text-white'
                       }`}
                       title={m.status === 'maintenance' ? 'Clear maintenance flag and mark available' : 'Flag machine as out of service'}
                     >
@@ -687,10 +710,10 @@ export const EquipmentListView: React.FC = () => {
                     </button>
                     <button
                       onClick={e => handleViewOnMap(e, m)}
-                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-colors"
+                      className="p-2 px-2.5 bg-[#111111] hover:bg-[#222222] text-slate-300 hover:text-white border border-[#333333] transition-colors"
                       title="Locate on floorplan"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                      <MapPin className="w-3.5 h-3.5 text-[#FFC107]" />
                     </button>
                   </>
                 )}
@@ -707,6 +730,8 @@ export const EquipmentListView: React.FC = () => {
           onClose={() => setLoggingServiceId(null)}
           onServiced={(id) => {
             setRecentlyServicedId(id);
+            const m = machines.find(mach => mach.id === id);
+            showToast(`Safety inspection verified & cleared for ${m ? `${m.code} (${m.name})` : id}`, 'success');
             setTimeout(() => setRecentlyServicedId(prev => (prev === id ? null : prev)), 3000);
           }}
         />

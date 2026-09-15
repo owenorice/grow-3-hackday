@@ -8,6 +8,8 @@ import { EquipmentListView } from './components/equipment/EquipmentListView';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { WorkoutCircuitDrawer } from './components/circuit/WorkoutCircuitDrawer';
 import { SimulatorDrawer } from './components/simulator/SimulatorDrawer';
+import { ToastProvider } from './context/ToastContext';
+import { ToastContainer } from './components/common/ToastContainer';
 
 const AppContent: React.FC = () => {
   const { activeTab } = useGym();
@@ -51,7 +53,10 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <GymProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+        <ToastContainer />
+      </ToastProvider>
     </GymProvider>
   );
 };
