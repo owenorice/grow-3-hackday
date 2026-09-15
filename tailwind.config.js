@@ -38,6 +38,10 @@ export default {
           maint: '#555555',
         }
       },
+      fontFamily: {
+        display: ['Oswald', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      },
       letterSpacing: {
         'tight-title': '2px',
         'wide-title': '4px',

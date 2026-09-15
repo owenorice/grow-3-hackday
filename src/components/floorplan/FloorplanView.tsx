@@ -217,170 +217,193 @@ export const FloorplanView: React.FC = () => {
             {/* SVG Definitions */}
             <defs>
               {/* Floor Tile Grid */}
-              <pattern id="floor-grid" width="25" height="25" patternUnits="userSpaceOnUse">
-                <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" strokeWidth="0.6" />
+              <pattern id="floor-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#222222" strokeWidth="0.8" />
               </pattern>
 
               {/* Turf Texture */}
-              <pattern id="turf-stripes" width="20" height="20" patternUnits="userSpaceOnUse">
-                <rect width="20" height="10" fill="#064e3b" fillOpacity="0.35" />
-                <rect y="10" width="20" height="10" fill="#065f46" fillOpacity="0.45" />
+              <pattern id="turf-stripes" width="16" height="16" patternUnits="userSpaceOnUse">
+                <rect width="16" height="8" fill="#143601" fillOpacity="0.4" />
+                <rect y="8" width="16" height="8" fill="#1b4d02" fillOpacity="0.6" />
               </pattern>
 
+              {/* Ambient Stadium Spotlights */}
+              <radialGradient id="spotlight-power" cx="70%" cy="25%" r="45%">
+                <stop offset="0%" stopColor="#97D700" stopOpacity="0.10" />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+              </radialGradient>
+
+              <radialGradient id="spotlight-turf" cx="22%" cy="75%" r="40%">
+                <stop offset="0%" stopColor="#97D700" stopOpacity="0.10" />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+              </radialGradient>
+
+              <radialGradient id="spotlight-cardio" cx="20%" cy="25%" r="35%">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.06" />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+              </radialGradient>
+
               {/* Glow Filter for Active Machines */}
-              <filter id="emerald-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              <filter id="volt-glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#97D700" floodOpacity="0.7"/>
               </filter>
 
-              <filter id="overuse-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              <filter id="overuse-glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#DC3545" floodOpacity="0.8"/>
               </filter>
             </defs>
 
             {/* Background Canvas */}
-            <rect width="1000" height="580" fill="#080c14" />
+            <rect width="1000" height="580" fill="#000000" />
             <rect width="1000" height="580" fill="url(#floor-grid)" />
 
-            {/* OUTER WALLS */}
-            <rect x="15" y="15" width="970" height="550" rx="16" fill="none" stroke="#334155" strokeWidth="3" />
+            {/* Stadium Ambient Lights */}
+            <rect width="1000" height="580" fill="url(#spotlight-power)" pointerEvents="none" />
+            <rect width="1000" height="580" fill="url(#spotlight-turf)" pointerEvents="none" />
+            <rect width="1000" height="580" fill="url(#spotlight-cardio)" pointerEvents="none" />
+
+            {/* OUTER WALLS - Sharp Brutalist Zero-Radius */}
+            <rect x="15" y="15" width="970" height="550" rx="0" fill="none" stroke="#333333" strokeWidth="2.5" />
+            
+            {/* Corner Tactical Brackets */}
+            <path d="M 15 35 L 15 15 L 35 15" fill="none" stroke="#97D700" strokeWidth="2" />
+            <path d="M 965 15 L 985 15 L 985 35" fill="none" stroke="#97D700" strokeWidth="2" />
+            <path d="M 15 545 L 15 565 L 35 565" fill="none" stroke="#97D700" strokeWidth="2" />
+            <path d="M 965 565 L 985 565 L 985 545" fill="none" stroke="#97D700" strokeWidth="2" />
 
             {/* ENTRANCE & RECEPTION DOORS (Bottom Center) */}
             <g>
-              <rect x="440" y="555" width="120" height="15" fill="#0f172a" />
-              <path d="M 440 565 A 60 60 0 0 1 500 565" fill="none" stroke="#10b981" strokeWidth="2" strokeDasharray="3 3" />
-              <path d="M 560 565 A 60 60 0 0 0 500 565" fill="none" stroke="#10b981" strokeWidth="2" strokeDasharray="3 3" />
-              <text x="500" y="550" textAnchor="middle" fill="#10b981" fontSize="10" fontWeight="700" letterSpacing="0.1em">
+              <rect x="440" y="555" width="120" height="15" fill="#000000" stroke="#333333" strokeWidth="1" />
+              <path d="M 440 565 A 60 60 0 0 1 500 565" fill="none" stroke="#97D700" strokeWidth="2" strokeDasharray="3 3" />
+              <path d="M 560 565 A 60 60 0 0 0 500 565" fill="none" stroke="#97D700" strokeWidth="2" strokeDasharray="3 3" />
+              <text x="500" y="548" textAnchor="middle" fill="#97D700" fontSize="10" fontWeight="900" letterSpacing="0.15em">
                 MAIN CLUB ENTRANCE & TURNSTILES
               </text>
             </g>
 
             {/* LOCKER ROOMS & SPA EXITS (Top Center) */}
             <g>
-              <rect x="450" y="10" width="100" height="15" fill="#0f172a" />
-              <text x="500" y="24" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="600" letterSpacing="0.08em">
+              <rect x="445" y="10" width="110" height="15" fill="#000000" stroke="#333333" strokeWidth="1" />
+              <text x="500" y="22" textAnchor="middle" fill="#AAAAAA" fontSize="9" fontWeight="700" letterSpacing="0.12em">
                 TO SPA & LOCKER SUITES
               </text>
             </g>
 
             {/* HYDRATION & TOWEL STATIONS */}
-            <g transform="translate(385, 250)">
-              <rect x="0" y="0" width="26" height="26" rx="6" fill="#0284c7" fillOpacity="0.2" stroke="#38bdf8" strokeWidth="1" />
-              <circle cx="13" cy="13" r="7" fill="#0369a1" />
-              <text x="13" y="16" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="bold">H₂O</text>
-              <text x="13" y="36" textAnchor="middle" fill="#38bdf8" fontSize="8" fontWeight="600">WATER</text>
+            <g transform="translate(385, 245)">
+              <rect x="0" y="0" width="28" height="28" fill="#111111" stroke="#333333" strokeWidth="1.5" />
+              <text x="14" y="14" textAnchor="middle" fill="#97D700" fontSize="9" fontWeight="900">H₂O</text>
+              <text x="14" y="24" textAnchor="middle" fill="#AAAAAA" fontSize="7" fontWeight="700" letterSpacing="0.05em">WATER</text>
             </g>
 
-            <g transform="translate(385, 300)">
-              <rect x="0" y="0" width="26" height="26" rx="6" fill="#10b981" fillOpacity="0.2" stroke="#34d399" strokeWidth="1" />
-              <circle cx="13" cy="13" r="7" fill="#059669" />
-              <text x="13" y="16" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="bold">WIPES</text>
-              <text x="13" y="36" textAnchor="middle" fill="#34d399" fontSize="8" fontWeight="600">CLEAN</text>
+            <g transform="translate(385, 295)">
+              <rect x="0" y="0" width="28" height="28" fill="#111111" stroke="#333333" strokeWidth="1.5" />
+              <text x="14" y="14" textAnchor="middle" fill="#97D700" fontSize="9" fontWeight="900">WIPES</text>
+              <text x="14" y="24" textAnchor="middle" fill="#AAAAAA" fontSize="7" fontWeight="700" letterSpacing="0.05em">CLEAN</text>
             </g>
 
-            {/* ===================== ZONE 1: CARDIO DECK ===================== */}
+            {/* ===================== ZONE 1: CARDIO DECK POD ===================== */}
             <g>
               <rect
                 x="30"
                 y="30"
                 width="340"
                 height="225"
-                rx="12"
-                fill="#1e293b"
-                fillOpacity="0.35"
-                stroke="#3b82f6"
+                rx="0"
+                fill="#111111"
+                fillOpacity="0.4"
+                stroke="#333333"
                 strokeWidth="1.5"
-                strokeDasharray="4 3"
               />
-              <text x="45" y="52" fill="#93c5fd" fontSize="12" fontWeight="800" letterSpacing="0.05em">
+              <line x1="30" y1="30" x2="120" y2="30" stroke="#97D700" strokeWidth="2.5" />
+              <text x="45" y="52" fill="#FFFFFF" fontSize="12" fontWeight="900" letterSpacing="0.12em">
                 CARDIO DECK
               </text>
-              <text x="350" y="52" textAnchor="end" fill="#64748b" fontSize="10">
+              <text x="350" y="52" textAnchor="end" fill="#777777" fontSize="10" letterSpacing="0.05em">
                 LifeFitness & Matrix
               </text>
             </g>
 
-            {/* ===================== ZONE 2: POWER RACKS & BENCHES ===================== */}
+            {/* ===================== ZONE 2: POWER RACKS POD ===================== */}
             <g>
               <rect
                 x="430"
                 y="30"
                 width="540"
                 height="225"
-                rx="12"
-                fill="#1e293b"
-                fillOpacity="0.35"
-                stroke="#a855f7"
+                rx="0"
+                fill="#111111"
+                fillOpacity="0.4"
+                stroke="#333333"
                 strokeWidth="1.5"
-                strokeDasharray="4 3"
               />
-              <text x="445" y="52" fill="#d8b4fe" fontSize="12" fontWeight="800" letterSpacing="0.05em">
+              <line x1="430" y1="30" x2="550" y2="30" stroke="#97D700" strokeWidth="2.5" />
+              <text x="445" y="52" fill="#FFFFFF" fontSize="12" fontWeight="900" letterSpacing="0.12em">
                 POWER RACKS & OLYMPIC PLATFORMS
               </text>
-              <text x="955" y="52" textAnchor="end" fill="#64748b" fontSize="10">
+              <text x="955" y="52" textAnchor="end" fill="#777777" fontSize="10" letterSpacing="0.05em">
                 Eleiko & Hammer Strength
               </text>
             </g>
 
-            {/* ===================== ZONE 3: FREE WEIGHTS & TURF ===================== */}
+            {/* ===================== ZONE 3: FREE WEIGHTS & TURF POD ===================== */}
             <g>
               <rect
                 x="30"
                 y="280"
                 width="340"
                 height="265"
-                rx="12"
-                fill="#1e293b"
-                fillOpacity="0.35"
-                stroke="#10b981"
+                rx="0"
+                fill="#111111"
+                fillOpacity="0.4"
+                stroke="#333333"
                 strokeWidth="1.5"
-                strokeDasharray="4 3"
               />
-              <text x="45" y="302" fill="#6ee7b7" fontSize="12" fontWeight="800" letterSpacing="0.05em">
+              <line x1="30" y1="280" x2="130" y2="280" stroke="#97D700" strokeWidth="2.5" />
+              <text x="45" y="302" fill="#FFFFFF" fontSize="12" fontWeight="900" letterSpacing="0.12em">
                 FREE WEIGHTS & FUNCTIONAL TURF
               </text>
-              <text x="350" y="302" textAnchor="end" fill="#64748b" fontSize="10">
+              <text x="350" y="302" textAnchor="end" fill="#777777" fontSize="10" letterSpacing="0.05em">
                 Dumbbells to 50kg
               </text>
 
-              {/* Turf Grass pattern fill inside Turf area */}
-              <rect x="50" y="420" width="260" height="80" rx="8" fill="url(#turf-stripes)" stroke="#059669" strokeWidth="1" />
+              {/* Turf Runway Fill */}
+              <rect x="50" y="420" width="260" height="80" rx="0" fill="url(#turf-stripes)" stroke="#222222" strokeWidth="1" />
               {/* Turf distance markers */}
-              <line x1="115" y1="420" x2="115" y2="500" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="180" y1="420" x2="180" y2="500" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="245" y1="420" x2="245" y2="500" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" />
-              <text x="115" y="435" textAnchor="middle" fill="#6ee7b7" fontSize="8" fontWeight="bold">5M</text>
-              <text x="180" y="435" textAnchor="middle" fill="#6ee7b7" fontSize="8" fontWeight="bold">10M</text>
-              <text x="245" y="435" textAnchor="middle" fill="#6ee7b7" fontSize="8" fontWeight="bold">15M</text>
+              <line x1="115" y1="420" x2="115" y2="500" stroke="#97D700" strokeWidth="1.5" strokeDasharray="3 3" />
+              <line x1="180" y1="420" x2="180" y2="500" stroke="#97D700" strokeWidth="1.5" strokeDasharray="3 3" />
+              <line x1="245" y1="420" x2="245" y2="500" stroke="#97D700" strokeWidth="1.5" strokeDasharray="3 3" />
+              <text x="115" y="435" textAnchor="middle" fill="#97D700" fontSize="9" fontWeight="900">5M</text>
+              <text x="180" y="435" textAnchor="middle" fill="#97D700" fontSize="9" fontWeight="900">10M</text>
+              <text x="245" y="435" textAnchor="middle" fill="#97D700" fontSize="9" fontWeight="900">15M</text>
             </g>
 
-            {/* ===================== ZONE 4: CABLE & FUNCTIONAL BAY ===================== */}
+            {/* ===================== ZONE 4: CABLE & FUNCTIONAL BAY POD ===================== */}
             <g>
               <rect
                 x="430"
                 y="280"
                 width="540"
                 height="265"
-                rx="12"
-                fill="#1e293b"
-                fillOpacity="0.35"
-                stroke="#6366f1"
+                rx="0"
+                fill="#111111"
+                fillOpacity="0.4"
+                stroke="#333333"
                 strokeWidth="1.5"
-                strokeDasharray="4 3"
               />
-              <text x="445" y="302" fill="#a5b4fc" fontSize="12" fontWeight="800" letterSpacing="0.05em">
+              <line x1="430" y1="280" x2="560" y2="280" stroke="#97D700" strokeWidth="2.5" />
+              <text x="445" y="302" fill="#FFFFFF" fontSize="12" fontWeight="900" letterSpacing="0.12em">
                 CABLE CROSSOVER & PLATE LOADED
               </text>
-              <text x="955" y="302" textAnchor="end" fill="#64748b" fontSize="10">
+              <text x="955" y="302" textAnchor="end" fill="#777777" fontSize="10" letterSpacing="0.05em">
                 Pulleys & Leg Machines
               </text>
             </g>
 
             {/* Central Main Corridor */}
-            <line x1="398" y1="30" x2="398" y2="540" stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
-            <line x1="30" y1="265" x2="970" y2="265" stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
-            <text x="400" y="270" textAnchor="middle" fill="#475569" fontSize="9" letterSpacing="0.15em">
+            <line x1="398" y1="30" x2="398" y2="540" stroke="#222222" strokeWidth="1.5" strokeDasharray="6 4" />
+            <line x1="30" y1="265" x2="970" y2="265" stroke="#222222" strokeWidth="1.5" strokeDasharray="6 4" />
+            <text x="400" y="270" textAnchor="middle" fill="#555555" fontSize="9" fontWeight="700" letterSpacing="0.2em">
               MAIN CENTRAL CORRIDOR
             </text>
 
@@ -459,7 +482,7 @@ export const FloorplanView: React.FC = () => {
                     fill={fill}
                     stroke={stroke}
                     strokeWidth={isSelected || isHovered ? '2.5' : '1.5'}
-                    filter={isAvailable && !isStaff ? 'url(#emerald-glow)' : undefined}
+                    filter={isAvailable && !isStaff ? 'url(#volt-glow)' : undefined}
                     className="transition-colors duration-200"
                   />
 
