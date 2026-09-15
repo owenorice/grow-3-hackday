@@ -18,7 +18,7 @@ A high-voltage web application built for **Village Health & Wellness Clubs**, ma
 | Developer | Assigned Issue | Priority | Focus Area | Branch |
 |---|---|---|---|---|
 | 👤 **Owen** | **[#8 Athletic Split-Pod Hero & Live Status Banner](https://github.com/owenorice/grow-3-hackday/issues/8)** | `P1-mvp` | `src/components/layout/` | `feature/issue-8-hero-pod` |
-| 👤 **Oliver** | **[#3 Filterable Equipment Directory & Pod Cards](https://github.com/owenorice/grow-3-hackday/issues/3)** | `P1-mvp` | `src/components/equipment/` | `feature/issue-3-equipment-list` |
+| 👤 **Oliver** | **[#3 Filterable Equipment Directory & Pod Cards](https://github.com/owenorice/grow-3-hackday/issues/3)** & **[#9 Workout Circuit & Linear Queue](https://github.com/owenorice/grow-3-hackday/issues/9)** | `P1-mvp` / `P2` | `src/components/equipment/` & `src/components/circuit/` | `feature/issue-3-equipment-list` |
 | 👤 **Tom** | **[#4 Usage Analytics & Brutalist Telemetry Charts](https://github.com/owenorice/grow-3-hackday/issues/4)** | `P2-enhancement` | `src/components/analytics/` | `feature/issue-4-analytics` |
 | 👤 **Conor** | **[#6 Staff Maintenance Inspection Modal](https://github.com/owenorice/grow-3-hackday/issues/6)** & **[#5 Demo Simulator Controls](https://github.com/owenorice/grow-3-hackday/issues/5)** | `P2-enhancement` | `src/components/staff/` & `src/components/simulator/` | `feature/issue-6-staff-modal` |
 
