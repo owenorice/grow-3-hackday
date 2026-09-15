@@ -2,6 +2,7 @@ import React from 'react';
 import { GymProvider, useGym } from './store/GymContext';
 import { Header } from './components/layout/Header';
 import { Tabs } from './components/layout/Tabs';
+import { HeroPod } from './components/layout/HeroPod';
 import { FloorplanView } from './components/floorplan/FloorplanView';
 import { EquipmentListView } from './components/equipment/EquipmentListView';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
@@ -14,6 +15,11 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-[#97D700] selection:text-black">
       {/* Top Header with Guest / Staff Mode Switch & Live Gauges */}
       <Header />
+
+      {/* Hero Double Pod Banner */}
+      <div className="max-w-6xl w-full mx-auto px-4 pt-6">
+        <HeroPod />
+      </div>
 
       {/* Navigation Tabs */}
       <Tabs />
