@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useGym } from '../../store/GymContext';
 import { EquipmentCategory, GymMachine, GymZone } from '../../types/gym';
+import { ServiceModal } from '../staff/ServiceModal';
 import {
   Search,
   Filter,
@@ -39,7 +40,6 @@ export const EquipmentListView: React.FC = () => {
     setActiveTab,
     appMode,
     toggleMachineStatus,
-    logService,
     toggleMaintenance,
     circuit,
     addToCircuit,
@@ -53,7 +53,6 @@ export const EquipmentListView: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('code');
   const [staffServiceAlertsOnly, setStaffServiceAlertsOnly] = useState<boolean>(false);
   const [loggingServiceId, setLoggingServiceId] = useState<string | null>(null);
-  const [serviceNotesInput, setServiceNotesInput] = useState<string>('');
   const [recentlyServicedId, setRecentlyServicedId] = useState<string | null>(null);
 
   const categories: { id: EquipmentCategory | 'all'; label: string; icon: React.ReactNode }[] = [
@@ -182,20 +181,6 @@ export const EquipmentListView: React.FC = () => {
   const handleOpenLogModal = (e: React.MouseEvent, machine: GymMachine) => {
     e.stopPropagation();
     setLoggingServiceId(machine.id);
-    setServiceNotesInput(
-      machine.maintenanceStatus === 'critical_overuse'
-        ? 'Full tension re-calibration, cable inspection, and motor lube performed.'
-        : 'Routine preventive inspection, belt check, and bolt torque check completed.'
-    );
-  };
-
-  const handleConfirmServiceLog = (machineId: string) => {
-    logService(machineId, serviceNotesInput || 'Routine maintenance logged by facility staff.');
-    setLoggingServiceId(null);
-    setRecentlyServicedId(machineId);
-    setTimeout(() => {
-      setRecentlyServicedId(prev => (prev === machineId ? null : prev));
-    }, 3000);
   };
 
   const getCategoryIcon = (category: EquipmentCategory) => {
@@ -715,73 +700,18 @@ export const EquipmentListView: React.FC = () => {
         })}
       </div>
 
-      {/* Staff Quick Service Modal */}
-      {loggingServiceId && (
-        <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setLoggingServiceId(null)}
-        >
-          <div
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-600/20 border border-amber-600/40 flex items-center justify-center text-amber-400">
-                  <Wrench className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white">Log Preventive Service</h4>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {machines.find(m => m.id === loggingServiceId)?.code} •{' '}
-                    {machines.find(m => m.id === loggingServiceId)?.name}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setLoggingServiceId(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <p className="text-slate-300">
-                Logging maintenance will reset operational hours to <strong className="text-emerald-400">0h</strong>, clear
-                service warnings, and mark the machine status as <strong className="text-teal-400">Healthy</strong>.
-              </p>
-
-              <div>
-                <label className="block text-slate-400 font-medium mb-1">Service & Inspection Notes:</label>
-                <textarea
-                  rows={3}
-                  value={serviceNotesInput}
-                  onChange={e => setServiceNotesInput(e.target.value)}
-                  placeholder="Record work completed, belt tension, cable condition, etc..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-xs"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                onClick={() => setLoggingServiceId(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleConfirmServiceLog(loggingServiceId)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-1.5 shadow-lg shadow-amber-950/40 transition-all"
-              >
-                <Check className="w-3.5 h-3.5" />
-                Confirm & Reset Hours
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Staff Safety Inspection Modal */}
+      <ServiceModal
+        machineId={loggingServiceId}
+        isOpen={loggingServiceId !== null}
+        onClose={() => setLoggingServiceId(null)}
+        onServiceSuccess={id => {
+          setRecentlyServicedId(id);
+          setTimeout(() => {
+            setRecentlyServicedId(prev => (prev === id ? null : prev));
+          }, 3500);
+        }}
+      />
     </div>
   );
 };

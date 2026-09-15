@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useGym } from '../../store/GymContext';
 import { TrendingUp, Clock, Wrench, ShieldAlert, Zap, Dumbbell, BarChart2 } from 'lucide-react';
+import { ServiceModal } from '../staff/ServiceModal';
 
 export const AnalyticsView: React.FC = () => {
-  const { machines, appMode, logService } = useGym();
+  const { machines, appMode } = useGym();
   const isStaff = appMode === 'staff';
   const [hoveredHour, setHoveredHour] = useState<{ hour: number; avg: number } | null>(null);
+  const [inspectingMachineId, setInspectingMachineId] = useState<string | null>(null);
 
   // Sort machines by utilization
   const mostUsed = [...machines].sort((a, b) => b.utilizationPercentage - a.utilizationPercentage);
@@ -142,11 +144,11 @@ export const AnalyticsView: React.FC = () => {
 
                   <div className="shrink-0">
                     <button
-                      onClick={() => logService(m.id)}
+                      onClick={() => setInspectingMachineId(m.id)}
                       className="vg-btn vg-btn-3 text-xs px-4 py-2.5 tracking-wider w-full md:w-auto"
                     >
                       <Wrench className="w-3.5 h-3.5 mr-1" />
-                      LOG SERVICE & CLEAR
+                      INSPECT & CLEAR
                     </button>
                   </div>
                 </div>
@@ -282,6 +284,12 @@ export const AnalyticsView: React.FC = () => {
         </div>
       </div>
 
+      {/* Staff Inspection Checklist Modal */}
+      <ServiceModal
+        machineId={inspectingMachineId}
+        isOpen={inspectingMachineId !== null}
+        onClose={() => setInspectingMachineId(null)}
+      />
     </div>
   );
 };

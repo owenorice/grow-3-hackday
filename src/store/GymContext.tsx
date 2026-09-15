@@ -30,7 +30,7 @@ interface GymContextType {
 
   toggleMachineStatus: (id: string) => void;
   setMachineStatus: (id: string, status: GymMachine['status']) => void;
-  logService: (id: string, notes?: string) => void;
+  logService: (id: string, notes?: string, technician?: string) => void;
   toggleMaintenance: (id: string) => void;
 
   // Circuit Queue & Sequential Reservation
@@ -157,7 +157,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Staff Maintenance: Reset service hours & mark healthy
-  const logService = (id: string, notes?: string) => {
+  const logService = (id: string, notes?: string, technician = 'Staff On Duty') => {
     const today = new Date().toISOString().split('T')[0];
     setMachines(prev =>
       prev.map(m => {
@@ -173,7 +173,7 @@ export const GymProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             {
               date: today,
               type: notes || 'Routine Preventive Maintenance',
-              technician: 'Staff On Duty',
+              technician: technician || 'Staff On Duty',
             },
             ...(m.serviceHistory || []),
           ],
