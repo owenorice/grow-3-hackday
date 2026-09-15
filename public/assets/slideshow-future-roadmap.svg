@@ -1,0 +1,269 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients & Filters -->
+    <radialGradient id="stadiumSpot" cx="50%" cy="10%" r="70%">
+      <stop offset="0%" stop-color="#97D700" stop-opacity="0.14" />
+      <stop offset="60%" stop-color="#000000" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="1" />
+    </radialGradient>
+    <radialGradient id="cyanSpot" cx="80%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <filter id="neonVolt" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="voltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#97D700" />
+      <stop offset="100%" stop-color="#9FC63B" />
+    </linearGradient>
+    <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181a1c" />
+      <stop offset="100%" stop-color="#0d0e10" />
+    </linearGradient>
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#22262a" stroke-width="1" stroke-opacity="0.4" />
+    </pattern>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="1920" height="1080" fill="#060708" />
+  <rect width="1920" height="1080" fill="url(#gridPattern)" />
+  <rect width="1920" height="1080" fill="url(#stadiumSpot)" />
+  <rect width="1920" height="1080" fill="url(#cyanSpot)" />
+
+  <!-- Outer Vignette & Precision Borders -->
+  <rect x="24" y="24" width="1872" height="1032" fill="none" stroke="#262a2e" stroke-width="2" />
+  <!-- Corner Brackets -->
+  <path d="M 24 64 L 24 24 L 64 24" fill="none" stroke="#97D700" stroke-width="4" />
+  <path d="M 1856 24 L 1896 24 L 1896 64" fill="none" stroke="#97D700" stroke-width="4" />
+  <path d="M 24 1016 L 24 1056 L 64 1056" fill="none" stroke="#97D700" stroke-width="4" />
+  <path d="M 1856 1056 L 1896 1056 L 1896 1016" fill="none" stroke="#97D700" stroke-width="4" />
+
+  <!-- ================= TOP HEADER ================= -->
+  <g transform="translate(80, 85)">
+    <!-- Brand Tag -->
+    <rect x="0" y="0" width="160" height="26" fill="#97D700" />
+    <text x="80" y="18" fill="#000000" font-family="'Oswald', sans-serif" font-weight="900" font-size="13" text-anchor="middle" letter-spacing="2">
+      PRODUCT ROADMAP
+    </text>
+
+    <text x="180" y="20" fill="#889096" font-family="'Inter', sans-serif" font-weight="700" font-size="13" letter-spacing="3">
+      VILLAGE GYM INTELLIGENCE ECOSYSTEM // PHASE 4
+    </text>
+
+    <!-- Main Title -->
+    <text x="0" y="80" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="52" letter-spacing="2">
+      CAPEX TELEMETRY &amp; AI CIRCUIT OPTIMIZER
+    </text>
+
+    <text x="0" y="114" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="700" font-size="20" letter-spacing="4">
+      PREDICTIVE SENSING • FINANCIAL ROI JUSTIFICATION • ZERO-WAIT WORKOUT PATHING
+    </text>
+
+    <!-- Board Level Badge -->
+    <rect x="1560" y="20" width="200" height="38" fill="#111315" stroke="#33373b" stroke-width="1.5" />
+    <circle cx="1585" cy="39" r="6" fill="#97D700" filter="url(#neonVolt)" />
+    <text x="1605" y="44" fill="#E0E0E0" font-family="'Oswald', sans-serif" font-weight="700" font-size="13" letter-spacing="2">
+      EXECUTIVE SLIDE
+    </text>
+  </g>
+
+  <!-- ================= LEFT PILLAR: FINANCIAL CAPEX EXPORT ================= -->
+  <g transform="translate(80, 240)">
+    <!-- Main Card Body -->
+    <rect x="0" y="0" width="850" height="710" fill="url(#panelGrad)" stroke="#2b3036" stroke-width="2" />
+    <!-- Pillar Header Bar -->
+    <rect x="0" y="0" width="850" height="70" fill="#121416" stroke="#2b3036" stroke-width="2" />
+    <rect x="0" y="0" width="12" height="70" fill="#97D700" />
+    <text x="35" y="44" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="24" letter-spacing="2">
+      01 // FINANCE CAPEX &amp; FLEET UTILIZATION ENGINE
+    </text>
+    <text x="700" y="44" fill="#97D700" font-family="'Inter', sans-serif" font-weight="800" font-size="13" letter-spacing="1">
+      [CFO DASHBOARD]
+    </text>
+
+    <!-- Business Case Subheading -->
+    <text x="35" y="105" fill="#8c959e" font-family="'Inter', sans-serif" font-size="14" font-weight="600">
+      Automated quarterly telemetry converting machine load into procurement business cases.
+    </text>
+
+    <!-- Sub-Pod A: The Squat Rack Bottleneck -->
+    <rect x="35" y="130" width="780" height="150" fill="#0d0f11" stroke="#252a30" stroke-width="1.5" />
+    <rect x="35" y="130" width="6" height="150" fill="#DC3545" />
+    <text x="60" y="165" fill="#DC3545" font-family="'Oswald', sans-serif" font-weight="800" font-size="14" letter-spacing="2">
+      CRITICAL BOTTLENECK DETECTED • 96.4% PEAK UTILIZATION
+    </text>
+    <text x="60" y="195" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="22">
+      OLYMPIC POWER RACKS (ZONE: STRENGTH &amp; RACKS)
+    </text>
+    <text x="60" y="224" fill="#c4cad0" font-family="'Inter', sans-serif" font-size="13">
+      Member wait times exceed 26 mins between 17:30 - 19:45 daily. Peak turnaway risk: 14%.
+    </text>
+    <rect x="60" y="240" width="730" height="28" fill="#1b0e11" stroke="#DC3545" stroke-width="1" />
+    <text x="75" y="259" fill="#FF707A" font-family="'Oswald', sans-serif" font-weight="700" font-size="12" letter-spacing="1">
+      ROI BUSINESS CASE: +2 Additional Racks (+£14,800 CapEx) ➔ +£38,400/yr Member Retention Value
+    </text>
+
+    <!-- Sub-Pod B: The Underutilized Asset -->
+    <rect x="35" y="300" width="780" height="150" fill="#0d0f11" stroke="#252a30" stroke-width="1.5" />
+    <rect x="35" y="300" width="6" height="150" fill="#9FC63B" />
+    <text x="60" y="335" fill="#9FC63B" font-family="'Oswald', sans-serif" font-weight="800" font-size="14" letter-spacing="2">
+      UNDERUTILIZATION RECOVERY • 18.2% AVG CAPACITY
+    </text>
+    <text x="60" y="365" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="22">
+      RECUMBENT BIKES &amp; UPRIGHT CYCLE BAY
+    </text>
+    <text x="60" y="394" fill="#c4cad0" font-family="'Inter', sans-serif" font-size="13">
+      Floor footprint (32m²) generates low engagement per square foot during peak club rush.
+    </text>
+    <rect x="60" y="410" width="730" height="28" fill="#13190a" stroke="#9FC63B" stroke-width="1" />
+    <text x="75" y="429" fill="#D3F578" font-family="'Oswald', sans-serif" font-weight="700" font-size="12" letter-spacing="1">
+      OPEX REALLOCATION: Consolidate 4 bikes to reclaim turf ➔ Add Functional Hyrox sled lane
+    </text>
+
+    <!-- Sub-Pod C: Executive Export Actions -->
+    <rect x="35" y="470" width="780" height="205" fill="#0b0d0e" stroke="#252a30" stroke-width="1.5" />
+    <text x="60" y="505" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="800" font-size="16" letter-spacing="2">
+      1-CLICK EXECUTIVE REPORT EXPORT ENGINE
+    </text>
+    <text x="60" y="532" fill="#8c959e" font-family="'Inter', sans-serif" font-size="13">
+      Scheduled monthly PDF &amp; CSV telemetry packets delivered to Group Finance Directors:
+    </text>
+
+    <!-- Export Buttons Mockup -->
+    <g transform="translate(60, 555)">
+      <rect x="0" y="0" width="345" height="52" fill="#97D700" />
+      <text x="172" y="33" fill="#000000" font-family="'Oswald', sans-serif" font-weight="900" font-size="16" text-anchor="middle" letter-spacing="2">
+        📥 EXPORT BOARD CAPEX AUDIT (PDF)
+      </text>
+
+      <rect x="375" y="0" width="345" height="52" fill="#14171a" stroke="#97D700" stroke-width="2" />
+      <text x="547" y="33" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="900" font-size="16" text-anchor="middle" letter-spacing="2">
+        📊 EXCEL / CSV TELEMETRY RAW
+      </text>
+    </g>
+
+    <text x="60" y="645" fill="#58626c" font-family="'Inter', sans-serif" font-size="11" font-weight="600">
+      *Includes Lifecycle Depreciation Forecast, Service Hours Accrual, and Warranty Expiration Matrix.
+    </text>
+  </g>
+
+  <!-- ================= RIGHT PILLAR: AI CIRCUIT OPTIMIZER ================= -->
+  <g transform="translate(990, 240)">
+    <!-- Main Card Body -->
+    <rect x="0" y="0" width="850" height="710" fill="url(#panelGrad)" stroke="#2b3036" stroke-width="2" />
+    <!-- Pillar Header Bar -->
+    <rect x="0" y="0" width="850" height="70" fill="#121416" stroke="#2b3036" stroke-width="2" />
+    <rect x="0" y="0" width="12" height="70" fill="#00e5ff" />
+    <text x="35" y="44" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="24" letter-spacing="2">
+      02 // SMART WORKOUT CIRCUIT RECOMMENDATION AI
+    </text>
+    <text x="680" y="44" fill="#00e5ff" font-family="'Inter', sans-serif" font-weight="800" font-size="13" letter-spacing="1">
+      [MEMBER APP]
+    </text>
+
+    <!-- Subheading -->
+    <text x="35" y="105" fill="#8c959e" font-family="'Inter', sans-serif" font-size="14" font-weight="600">
+      Dynamic re-routing algorithms that eliminate waiting lines across multi-station circuits.
+    </text>
+
+    <!-- Circuit Step 1: Active Station -->
+    <rect x="35" y="130" width="780" height="110" fill="#0d0f11" stroke="#252a30" stroke-width="1.5" />
+    <rect x="35" y="130" width="46" height="110" fill="#181c20" />
+    <text x="58" y="192" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="900" font-size="18" text-anchor="middle">
+      01
+    </text>
+    <text x="100" y="165" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="13" letter-spacing="2">
+      CURRENT STATION • ACTIVE SESSION (3M REMAINING)
+    </text>
+    <text x="100" y="195" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="20">
+      OLYMPIC POWER RACK #01
+    </text>
+    <rect x="630" y="155" width="160" height="32" fill="#091b0c" stroke="#97D700" stroke-width="1" />
+    <text x="710" y="176" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="11" text-anchor="middle" letter-spacing="1">
+      IN USE • SET 3 OF 4
+    </text>
+
+    <!-- Connecting Path Optimization Callout -->
+    <g transform="translate(140, 248)">
+      <line x1="0" y1="0" x2="0" y2="34" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,4" />
+      <polygon points="-5,34 5,34 0,42" fill="#00e5ff" />
+      <rect x="40" y="6" width="550" height="28" fill="#041a1f" stroke="#00e5ff" stroke-width="1" />
+      <text x="55" y="25" fill="#00e5ff" font-family="'Oswald', sans-serif" font-weight="800" font-size="12" letter-spacing="1.5">
+        ⚡ AI ROUTE ADJUSTMENT: Lat Pulldown busy (+16m wait) ➔ Swapped to Cable Cross
+      </text>
+    </g>
+
+    <!-- Circuit Step 2: Dynamic Re-Order -->
+    <rect x="35" y="298" width="780" height="110" fill="#0d0f11" stroke="#00e5ff" stroke-width="1.5" />
+    <rect x="35" y="298" width="46" height="110" fill="#00e5ff" />
+    <text x="58" y="360" fill="#000000" font-family="'Oswald', sans-serif" font-weight="900" font-size="18" text-anchor="middle">
+      02
+    </text>
+    <text x="100" y="333" fill="#00e5ff" font-family="'Oswald', sans-serif" font-weight="800" font-size="13" letter-spacing="2">
+      SMART QUEUE RECOMMENDATION • ZERO WAIT GUARANTEED
+    </text>
+    <text x="100" y="363" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="20">
+      DUAL ADJUSTABLE CABLE CROSSOVER #01
+    </text>
+    <rect x="630" y="323" width="160" height="32" fill="#002f35" stroke="#00e5ff" stroke-width="1" />
+    <text x="710" y="344" fill="#00e5ff" font-family="'Oswald', sans-serif" font-weight="800" font-size="11" text-anchor="middle" letter-spacing="1">
+      READY IN 2 MINS
+    </text>
+
+    <!-- Connecting Path Biomechanical Equivalent Callout -->
+    <g transform="translate(140, 416)">
+      <line x1="0" y1="0" x2="0" y2="34" stroke="#97D700" stroke-width="2" stroke-dasharray="4,4" />
+      <polygon points="-5,34 5,34 0,42" fill="#97D700" />
+      <rect x="40" y="6" width="550" height="28" fill="#141c09" stroke="#97D700" stroke-width="1" />
+      <text x="55" y="25" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="12" letter-spacing="1.5">
+        🔄 BIOMECHANICAL EQUIVALENT: Flat Bench in use ➔ Incline Dumbbell Bench #2 suggested
+      </text>
+    </g>
+
+    <!-- Circuit Step 3: Biomechanical Fallback -->
+    <rect x="35" y="466" width="780" height="110" fill="#0d0f11" stroke="#252a30" stroke-width="1.5" />
+    <rect x="35" y="466" width="46" height="110" fill="#181c20" />
+    <text x="58" y="528" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="900" font-size="18" text-anchor="middle">
+      03
+    </text>
+    <text x="100" y="501" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="13" letter-spacing="2">
+      EQUIVALENT STATION • AUTOMATIC SLOT HOLD
+    </text>
+    <text x="100" y="531" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="20">
+      INCLINE DUMBBELL BENCH #02
+    </text>
+    <rect x="630" y="491" width="160" height="32" fill="#0f1f0a" stroke="#97D700" stroke-width="1" />
+    <text x="710" y="512" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="11" text-anchor="middle" letter-spacing="1">
+      AVAILABLE NOW
+    </text>
+
+    <!-- Bottom Stat Banner -->
+    <rect x="35" y="596" width="780" height="80" fill="#041217" stroke="#00e5ff" stroke-width="1.5" />
+    <text x="65" y="632" fill="#FFFFFF" font-family="'Oswald', sans-serif" font-weight="900" font-size="22" letter-spacing="1">
+      RESULT: 24 MINS SAVED PER WORKOUT SESSION
+    </text>
+    <text x="65" y="658" fill="#00e5ff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">
+      Zero congestion queues • Higher member satisfaction • 100% adherence to workout plan
+    </text>
+  </g>
+
+  <!-- ================= BOTTOM KEYNOTE FOOTER ================= -->
+  <g transform="translate(80, 975)">
+    <rect x="0" y="0" width="1760" height="50" fill="#0f1113" stroke="#2b3036" stroke-width="1" />
+    <text x="30" y="31" fill="#7d8690" font-family="'Oswald', sans-serif" font-weight="700" font-size="14" letter-spacing="3">
+      COMMERCIAL IMPACT:
+    </text>
+    <text x="210" y="31" fill="#FFFFFF" font-family="'Inter', sans-serif" font-weight="600" font-size="13">
+      Increases average member lifetime value (LTV) through eliminated peak-hour workout friction &amp; arms executive leadership with objective capex allocation data.
+    </text>
+    <text x="1650" y="31" fill="#97D700" font-family="'Oswald', sans-serif" font-weight="800" font-size="14" letter-spacing="2">
+      Q4 2026 DEPLOYMENT
+    </text>
+  </g>
+</svg>
